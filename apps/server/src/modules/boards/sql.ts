@@ -1,4 +1,4 @@
-import type { Queryable } from '../../db';
+import type { Queryable } from '../../tx';
 import type { Board, Column } from '../../gql/types';
 
 export interface BoardRow {

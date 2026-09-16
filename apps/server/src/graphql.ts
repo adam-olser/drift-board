@@ -10,6 +10,7 @@ import { readSessionId } from './modules/sessions/cookie';
 import { findSession, type SessionRow } from './modules/sessions/sql';
 import { sessionResolvers } from './modules/sessions/resolvers';
 import { boardResolvers } from './modules/boards/resolvers';
+import { cardResolvers } from './modules/cards/resolvers';
 
 /** Per-request context handed to every resolver. `session` is null until startGuestSession. */
 export interface Context {
@@ -50,7 +51,7 @@ function touchesSessionOp(document: DocumentNode): boolean {
 
 const resolvers = {
   Query: { ...sessionResolvers.Query, ...boardResolvers.Query },
-  Mutation: { ...sessionResolvers.Mutation, ...boardResolvers.Mutation },
+  Mutation: { ...sessionResolvers.Mutation, ...boardResolvers.Mutation, ...cardResolvers.Mutation },
   Viewer: boardResolvers.Viewer,
   Board: boardResolvers.Board,
 } satisfies Resolvers;

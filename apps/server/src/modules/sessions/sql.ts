@@ -1,4 +1,4 @@
-import type { Queryable } from '../../db';
+import type { Queryable } from '../../tx';
 import type { Session } from '../../gql/types';
 
 export interface SessionRow {
