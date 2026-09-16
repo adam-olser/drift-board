@@ -298,8 +298,8 @@ Each task is one commit (or two). "Done when" is the verification, executed, not
 **Core demo complete.** Tag `v0.1`.
 
 ### Milestone 8 — Account auth (~4 h)
-- [ ] T8.1 `signUp`/`logIn`/`logOut` with `crypto.scrypt` (N=2^15, 16-byte salt, stored `salt:hash`), constant-time compare; `logOut` creates a new guest session and sets the cookie.
-- [ ] T8.2 `SignInDialog.tsx` states B/C, `My boards` menu (state D), header state 2.
+- [x] T8.1 `signUp`/`logIn`/`logOut` with `crypto.scrypt` (N=2^15, 16-byte salt, stored `salt:hash`), constant-time compare; `logOut` creates a new guest session and sets the cookie.
+- [x] T8.2 `SignInDialog.tsx` states B/C, `My boards` menu (state D), header state 2.
 *Done when* Milestone 8's Verify line passes.
 
 ### Milestone 9 — Card-level presence (~2 h)

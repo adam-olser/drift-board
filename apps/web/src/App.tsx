@@ -7,6 +7,7 @@ import { useBoard } from './features/board/useBoard';
 import { useBoardEvents } from './features/board/useBoardEvents';
 import { Home } from './features/boards/Home';
 import { NameDialog } from './features/session/NameDialog';
+import { SignInDialog } from './features/session/SignInDialog';
 import { useViewer } from './features/session/useViewer';
 import { Header } from './features/sync/Header';
 import { SyncLog } from './features/sync/SyncLog';
@@ -15,7 +16,13 @@ import { Toasts } from './features/sync/Toasts';
 import { useRoute } from './router';
 import styles from './App.module.css';
 
-function BoardScreen({ slug, me }: { slug: string; me: string | null }) {
+interface BoardScreenProps {
+  slug: string;
+  viewer: ReturnType<typeof useViewer>;
+  onSignIn: () => void;
+}
+
+function BoardScreen({ slug, viewer, onSignIn }: BoardScreenProps) {
   const { board, loading, error, move, create, rename, edit, remove, tailPosition } =
     useBoard(slug);
   useBoardEvents(board?.id);
@@ -26,7 +33,13 @@ function BoardScreen({ slug, me }: { slug: string; me: string | null }) {
   if (!board) return <p className={styles.status}>No board at /b/{slug}.</p>;
   return (
     <>
-      <Header slug={slug} boardName={board.name} me={me} />
+      <Header
+        slug={slug}
+        boardName={board.name}
+        session={viewer.session}
+        onSignIn={onSignIn}
+        onLogOut={viewer.logOut}
+      />
       <Board
         board={board}
         onMove={move}
@@ -57,20 +70,31 @@ function Screen() {
   const route = useRoute();
   const viewer = useViewer();
   const { board } = useBoard(route.kind === 'board' ? route.slug : '');
+  const [signIn, setSignIn] = useState(false);
   if (viewer.loading) return null;
   return (
     <>
       {route.kind === 'board' ? (
-        <BoardScreen slug={route.slug} me={viewer.session?.displayName ?? null} />
+        <BoardScreen slug={route.slug} viewer={viewer} onSignIn={() => setSignIn(true)} />
       ) : (
         <Home />
       )}
-      {viewer.session ? null : (
+      {signIn ? (
+        <SignInDialog
+          busy={viewer.busy}
+          errorMessage={viewer.authError}
+          onLogIn={viewer.logIn}
+          onSignUp={viewer.signUp}
+          onClose={() => setSignIn(false)}
+          guestOption={!viewer.session}
+        />
+      ) : viewer.session ? null : (
         <NameDialog
           boardName={board?.name}
           busy={viewer.starting}
           errorMessage={viewer.error?.message}
           onSubmit={viewer.startGuestSession}
+          onSignIn={() => setSignIn(true)}
         />
       )}
     </>

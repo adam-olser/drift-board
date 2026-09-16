@@ -148,3 +148,26 @@
   color: var(--muted);
   white-space: nowrap;
 }
+
+.email {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text);
+}
+
+.menuAnchor {
+  position: relative;
+  display: inline-flex;
+}
+
+.signIn {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: var(--radius);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+}
+.signIn:disabled {
+  opacity: 0.5;
+}

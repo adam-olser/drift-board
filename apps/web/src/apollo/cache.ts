@@ -13,6 +13,9 @@ export const createCache = () =>
           board: { keyArgs: ['slug'] },
         },
       },
+      // why: Viewer has no id; without merge: true a query selecting only viewer.boards would
+      // replace the object and drop viewer.session until the Viewer query answers again.
+      Viewer: { merge: true },
       Subscription: {
         // each event replaces the last; the Card objects inside are normalised by id anyway
         fields: { boardEvents: { merge: false } },

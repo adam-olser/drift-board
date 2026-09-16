@@ -1,5 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
+import { AccountMenu } from '@/features/session/AccountMenu';
+import type { SessionFieldsFragment } from '@/gql/graphql';
 import { Brand } from './Brand';
 import { initials } from './initials';
 import { syncStore } from './SyncStore';
@@ -9,7 +11,9 @@ import styles from './Header.module.css';
 interface Props {
   slug: string;
   boardName: string;
-  me: string | null;
+  session: SessionFieldsFragment | null;
+  onSignIn: () => void;
+  onLogOut: () => void;
 }
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -26,9 +30,17 @@ function useClock(active: boolean) {
 }
 
 /** T7.1: HeaderStates 1 (online), 3 (offline + banner), 4 (syncing + banner); driven by SyncStore. */
-export const Header = observer(function Header({ slug, boardName, me }: Props) {
+export const Header = observer(function Header({
+  slug,
+  boardName,
+  session,
+  onSignIn,
+  onLogOut,
+}: Props) {
   const { connection, peers, queue, replayProgress, latencyMs, offlineSince } = syncStore;
   const theme = useTheme();
+  const [menu, setMenu] = useState(false);
+  const user = session?.user ?? null;
   useClock(connection === 'offline');
   const tone = connection === 'online' ? 'ok' : connection === 'offline' ? 'queued' : 'info';
   const pillText =
@@ -73,7 +85,11 @@ export const Header = observer(function Header({ slug, boardName, me }: Props) {
               {queue.length} queued
             </span>
           ) : null}
-          {me ? <span className={styles.me}>guest:{me}</span> : null}
+          {user ? (
+            <span className={styles.email}>{user.email}</span>
+          ) : session ? (
+            <span className={styles.me}>guest:{session.displayName}</span>
+          ) : null}
           <button
             type="button"
             className={styles.switch}
@@ -106,6 +122,35 @@ export const Header = observer(function Header({ slug, boardName, me }: Props) {
               </svg>
             </span>
           </button>
+          {user && session ? (
+            <span className={styles.menuAnchor}>
+              <button
+                type="button"
+                className={styles.pill}
+                onClick={() => setMenu(m => !m)}
+                aria-expanded={menu}
+                aria-haspopup="menu"
+              >
+                My boards
+              </button>
+              {menu ? (
+                <AccountMenu
+                  session={{ ...session, user }}
+                  onClose={() => setMenu(false)}
+                  onLogOut={onLogOut}
+                />
+              ) : null}
+            </span>
+          ) : session ? (
+            <button
+              type="button"
+              className={styles.signIn}
+              onClick={onSignIn}
+              disabled={connection === 'offline'}
+            >
+              Sign in
+            </button>
+          ) : null}
         </div>
       </header>
       {connection === 'offline' ? (

@@ -7,10 +7,11 @@ interface Props {
   busy: boolean;
   errorMessage?: string | undefined;
   onSubmit: (displayName: string) => void;
+  onSignIn: () => void;
 }
 
 /** SignIn artboard state A: first visit, pick a name. Creates the guest session. */
-export function NameDialog({ boardName, busy, errorMessage, onSubmit }: Props) {
+export function NameDialog({ boardName, busy, errorMessage, onSubmit, onSignIn }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   const [name, setName] = useState('');
 
@@ -47,6 +48,12 @@ export function NameDialog({ boardName, busy, errorMessage, onSubmit }: Props) {
         <button type="submit" className={styles.submit} disabled={busy || !name.trim()}>
           {boardName ? 'Join board' : 'Continue'}
         </button>
+        <p className={styles.foot}>
+          Have an account?{' '}
+          <button type="button" className={styles.footLink} onClick={onSignIn}>
+            Sign in instead
+          </button>
+        </p>
       </form>
     </dialog>
   );

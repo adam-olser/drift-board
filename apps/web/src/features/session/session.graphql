@@ -2,6 +2,11 @@ fragment SessionFields on Session {
   id
   displayName
   color
+  user {
+    id
+    email
+    name
+  }
 }
 
 query Viewer {
@@ -14,6 +19,24 @@ query Viewer {
 
 mutation StartGuestSession($displayName: String!) {
   startGuestSession(displayName: $displayName) {
+    ...SessionFields
+  }
+}
+
+mutation SignUp($email: String!, $password: String!, $name: String!) {
+  signUp(email: $email, password: $password, name: $name) {
+    ...SessionFields
+  }
+}
+
+mutation LogIn($email: String!, $password: String!) {
+  logIn(email: $email, password: $password) {
+    ...SessionFields
+  }
+}
+
+mutation LogOut {
+  logOut {
     ...SessionFields
   }
 }
