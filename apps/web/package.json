@@ -15,6 +15,9 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "graphql": "^16.14.2",
+    "graphql-ws": "^6.2.2",
+    "mobx": "^7.0.3",
+    "mobx-react-lite": "^5.0.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

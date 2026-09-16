@@ -4,6 +4,7 @@ import { unauthenticated } from '../../errors';
 import { assertLength, DESCRIPTION_MAX, TITLE_MAX } from '../../limits';
 import type { Context } from '../../graphql';
 import * as policy from './policy';
+import { publish } from '../events';
 
 function requireSession(ctx: Context): string {
   if (!ctx.session) throw unauthenticated();
@@ -21,6 +22,11 @@ export const cardResolvers = {
           policy.createCard(tx, sessionId, { id, boardId, columnId, title: cleanTitle, position })
         )
       );
+      if (applied.changed) {
+        publish(applied.boardId, {
+          boardEvents: { __typename: 'CardCreated', origin: sessionId, card: applied.result },
+        });
+      }
       return applied.result;
     },
     updateCard: async (_p, { opId, cardId, baseVersion, title, description }, ctx) => {
@@ -38,6 +44,11 @@ export const cardResolvers = {
           })
         )
       );
+      if (applied.changed) {
+        publish(applied.boardId, {
+          boardEvents: { __typename: 'CardUpdated', origin: sessionId, card: applied.result },
+        });
+      }
       return applied.result;
     },
     moveCard: async (_p, { opId, cardId, columnId, position }, ctx) => {
@@ -47,6 +58,11 @@ export const cardResolvers = {
           policy.moveCard(tx, sessionId, { cardId, columnId, position })
         )
       );
+      if (applied.changed) {
+        publish(applied.boardId, {
+          boardEvents: { __typename: 'CardMoved', origin: sessionId, cards: applied.result },
+        });
+      }
       return applied.result;
     },
     deleteCard: async (_p, { opId, cardId }, ctx) => {
@@ -56,6 +72,11 @@ export const cardResolvers = {
           policy.deleteCard(tx, sessionId, { cardId })
         )
       );
+      if (applied.changed) {
+        publish(applied.boardId, {
+          boardEvents: { __typename: 'CardDeleted', origin: sessionId, cardId: applied.result },
+        });
+      }
       return applied.result;
     },
   },
