@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif; }
+    a { color: #1d4ed8; } a:hover { color: #1e3a8a; }
+    .node { position: absolute; width: 220px; height: 68px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 10px 14px; border: 1.5px solid #1f1d1a; border-radius: 6px; background: #ffffff; font-size: 13px; line-height: 1.25; color: #1f1d1a; }
+    .node .k { font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; color: #6b6660; }
+    .server { background: #e8eef9; border-color: #1e3a8a; }
+    .server .k { color: #1e3a8a; }
+    .decision { border-style: dashed; background: #fbf7ea; }
+    .offline { background: #f3e8e2; border-color: #7c2d12; }
+    .offline .k { color: #7c2d12; }
+    .lbl { position: absolute; font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 11px; color: #3f3b36; background: #f6f4ef; padding: 0 4px; }
+    .lane { position: absolute; left: 24px; font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #8a847c; }
+  </style>
+</helmet>
+<div style="position: relative; width: 1420px; height: 880px; background: #f6f4ef; overflow: hidden;">
+
+  <div style="position: absolute; left: 40px; top: 20px; display: flex; align-items: baseline; gap: 14px;">
+    <div style="font-size: 20px; font-weight: 600; color: #1f1d1a;">Driftboard — app flow</div>
+    <div style="font-size: 13px; color: #6b6660;">entry → optimistic mutation → sync / offline / reject paths</div>
+  </div>
+  <div style="position: absolute; right: 40px; top: 24px; display: flex; gap: 14px; font-size: 12px; color: #3f3b36;">
+    <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 14px; height: 10px; border: 1.5px solid #1f1d1a; background: #fff; border-radius: 2px;"></span>client</div>
+    <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 14px; height: 10px; border: 1.5px solid #1e3a8a; background: #e8eef9; border-radius: 2px;"></span>server / Postgres</div>
+    <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 14px; height: 10px; border: 1.5px dashed #1f1d1a; background: #fbf7ea; border-radius: 2px;"></span>decision</div>
+    <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 14px; height: 10px; border: 1.5px solid #7c2d12; background: #f3e8e2; border-radius: 2px;"></span>offline path</div>
+  </div>
+
+  <svg width="1420" height="880" style="position: absolute; left: 0; top: 0;" viewBox="0 0 1420 880" fill="none" stroke="#1f1d1a" stroke-width="1.5">
+    <defs>
+      <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f1d1a" stroke="none"></path>
+      </marker>
+    </defs>
+    <path d="M 260 134 L 320 134" marker-end="url(#ah)"></path>
+    <path d="M 540 134 L 570 134 L 570 64 L 600 64" marker-end="url(#ah)"></path>
+    <path d="M 540 134 L 570 134 L 570 204 L 600 204" marker-end="url(#ah)"></path>
+    <path d="M 820 64 L 850 64 L 850 134 L 880 134" marker-end="url(#ah)"></path>
+    <path d="M 820 204 L 850 204 L 850 134" ></path>
+    <path d="M 1100 134 L 1160 134" marker-end="url(#ah)"></path>
+    <path d="M 1270 168 L 1270 290 L 150 290 L 150 340" marker-end="url(#ah)"></path>
+    <path d="M 260 374 L 320 374" marker-end="url(#ah)"></path>
+    <path d="M 540 374 L 600 374" marker-end="url(#ah)"></path>
+    <path d="M 820 374 L 880 374" marker-end="url(#ah)"></path>
+    <path d="M 1100 374 L 1160 374" marker-end="url(#ah)"></path>
+    <path d="M 710 408 L 710 480" marker-end="url(#ah)" stroke="#7c2d12"></path>
+    <path d="M 600 514 L 540 514" marker-end="url(#ah)" stroke="#7c2d12"></path>
+    <path d="M 320 514 L 260 514" marker-end="url(#ah)" stroke="#7c2d12"></path>
+    <path d="M 150 480 L 150 408" marker-end="url(#ah)" stroke="#7c2d12"></path>
+    <path d="M 1270 408 L 1270 620" marker-end="url(#ah)"></path>
+    <path d="M 1160 654 L 1100 654" marker-end="url(#ah)"></path>
+    <path d="M 880 654 L 820 654" marker-end="url(#ah)"></path>
+    <path d="M 1270 688 L 1270 770" marker-end="url(#ah)" stroke-dasharray="5 4"></path>
+  </svg>
+
+  <div class="lbl" style="left: 574px; top: 92px;">no cookie</div>
+  <div class="lbl" style="left: 574px; top: 166px;">has cookie</div>
+  <div class="lbl" style="left: 700px; top: 279px;">board ready · every later edit loops here</div>
+  <div class="lbl" style="left: 836px; top: 356px;">yes</div>
+  <div class="lbl" style="left: 720px; top: 436px; color: #7c2d12;">no</div>
+  <div class="lbl" style="left: 160px; top: 436px; color: #7c2d12;">converged</div>
+  <div class="lbl" style="left: 1282px; top: 500px;">persisted</div>
+  <div class="lbl" style="left: 1282px; top: 720px;">rejected · CardGone / VersionMismatch</div>
+
+  <div class="lane" style="top: 74px;">1 · entry</div>
+  <div class="lane" style="top: 314px;">2 · mutation</div>
+  <div class="lane" style="top: 454px;">3 · offline</div>
+  <div class="lane" style="top: 594px;">4 · sync</div>
+
+  <div class="node" style="left: 40px; top: 100px;"><span class="k">client</span>Open shareable board link</div>
+  <div class="node decision" style="left: 320px; top: 100px;"><span class="k">decision</span>Session cookie present?</div>
+  <div class="node" style="left: 600px; top: 30px;"><span class="k">guest session</span>Session row: display name + colour</div>
+  <div class="node" style="left: 600px; top: 170px;"><span class="k">account session</span>userId set · real name in presence</div>
+  <div class="node server" style="left: 880px; top: 100px;"><span class="k">graphql query · socket</span>board(slug) — canonical state</div>
+  <div class="node server" style="left: 1160px; top: 100px;"><span class="k">subscription</span>boardEvents(boardId)</div>
+
+  <div class="node" style="left: 40px; top: 340px;"><span class="k">client</span>User drags or edits a card</div>
+  <div class="node" style="left: 320px; top: 340px;"><span class="k">optimistic</span>Apollo optimisticResponse layer applied</div>
+  <div class="node decision" style="left: 600px; top: 340px;"><span class="k">decision</span>Socket connected?</div>
+  <div class="node" style="left: 880px; top: 340px;"><span class="k">graphql mutation · socket</span>moveCard(position) / updateCard(baseVersion) · opId</div>
+  <div class="node server" style="left: 1160px; top: 340px;"><span class="k">server</span>Validate · policy per op · one txn + ops row</div>
+
+  <div class="node offline" style="left: 600px; top: 480px;"><span class="k">queueLink</span>Hold the mutation; layer stays on screen</div>
+  <div class="node offline" style="left: 320px; top: 480px;"><span class="k">reconnect</span>Replay parked ops in order, rebasing baseVersion</div>
+  <div class="node offline" style="left: 40px; top: 480px;"><span class="k">reconcile</span>network-only board query overwrites cache</div>
+
+  <div class="node server" style="left: 1160px; top: 620px;"><span class="k">result</span>Canonical Card replaces optimistic layer</div>
+  <div class="node server" style="left: 880px; top: 620px;"><span class="k">broadcast</span>Emit event to other room peers</div>
+  <div class="node" style="left: 600px; top: 620px;"><span class="k">peers</span>Event written into cache · no refetch</div>
+  <div class="node" style="left: 1160px; top: 770px; border-color: #991b1b; background: #fdecec;"><span class="k" style="color: #991b1b;">rollback</span>Apollo drops the layer · toast via MobX</div>
+
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif; }
+    a { color: #2f6f6a; } a:hover { color: #1f4f4b; }
+    .serif { font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; }
+    .card { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; background: #ffffff; border: 1px solid #e3ddd2; border-radius: 4px; }
+    .card .t { font-family: 'Instrument Serif', Georgia, serif; font-size: 19px; line-height: 1.2; color: #1c1a17; }
+    .card .m { font-size: 12px; color: #8a8377; display: flex; align-items: center; gap: 8px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .colh { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid #1c1a17; }
+    .colh .n { font-family: 'Instrument Serif', Georgia, serif; font-size: 26px; font-style: italic; color: #1c1a17; }
+    .colh .c { font-size: 12px; color: #8a8377; letter-spacing: 0.06em; }
+  </style>
+</helmet>
+<div style="width: 1200px; height: 760px; box-sizing: border-box; background: #f7f4ee; color: #1c1a17; display: flex; flex-direction: column; overflow: hidden;">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 22px 40px 18px 40px;">
+    <div style="display: flex; align-items: baseline; gap: 18px;">
+      <div class="serif" style="font-size: 24px; letter-spacing: -0.01em;">Driftboard</div>
+      <div style="width: 1px; height: 18px; background: #cfc8bb; align-self: center;"></div>
+      <div style="font-size: 15px; font-weight: 500;">Client site redesign</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 18px;">
+      <div style="display: flex; align-items: center; gap: -4px;">
+        <div style="width: 28px; height: 28px; border-radius: 50%; background: #2f6f6a; color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; border: 2px solid #f7f4ee;">MK</div>
+        <div style="width: 28px; height: 28px; border-radius: 50%; background: #b5573a; color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; border: 2px solid #f7f4ee; margin-left: -8px;">JO</div>
+        <div style="width: 28px; height: 28px; border-radius: 50%; background: #6b5fa8; color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; border: 2px solid #f7f4ee; margin-left: -8px;">A</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: #2f6f6a;">
+        <span class="dot" style="background: #2f6f6a;"></span>Synced
+      </div>
+      <div style="font-size: 12.5px; color: #8a8377;">Guest · Ada</div>
+      <div style="font-size: 12.5px; font-weight: 500; padding: 7px 14px; border: 1px solid #1c1a17; border-radius: 999px;">Sign in</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; padding: 10px 40px 0 40px; flex-grow: 1;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div class="colh"><span class="n">To do</span><span class="c">4</span></div>
+      <div class="card"><div class="t">Rewrite hero copy for the launch page</div><div class="m"><span class="dot" style="background: #2f6f6a;"></span>Mira · 2 min ago</div></div>
+      <div class="card"><div class="t">Collect logo files from the client</div><div class="m"><span class="dot" style="background: #6b5fa8;"></span>Ada · yesterday</div></div>
+      <div class="card"><div class="t">Decide on the pricing table layout</div><div class="m"><span class="dot" style="background: #b5573a;"></span>Jon · yesterday</div></div>
+      <div class="card"><div class="t">Set up staging domain</div><div class="m"><span class="dot" style="background: #6b5fa8;"></span>Ada · 3 days ago</div></div>
+      <div style="font-size: 13px; color: #8a8377; padding: 6px 2px;">+ Add a card</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div class="colh"><span class="n">In progress</span><span class="c">2</span></div>
+      <div class="card" style="border-color: #2f6f6a; box-shadow: 0 0 0 3px rgba(47, 111, 106, 0.12);"><div class="t">Build responsive nav</div><div class="m"><span class="dot" style="background: #2f6f6a;"></span><span style="color: #2f6f6a;">Mira is editing</span></div></div>
+      <div class="card"><div class="t">Photograph the workshop</div><div class="m"><span class="dot" style="background: #b5573a;"></span>Jon · 1 hour ago</div></div>
+      <div style="font-size: 13px; color: #8a8377; padding: 6px 2px;">+ Add a card</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div class="colh"><span class="n">Done</span><span class="c">3</span></div>
+      <div class="card" style="opacity: 0.7;"><div class="t">Agree on scope and timeline</div><div class="m"><span class="dot" style="background: #6b5fa8;"></span>Ada · last week</div></div>
+      <div class="card" style="opacity: 0.7;"><div class="t">Choose type pairing</div><div class="m"><span class="dot" style="background: #2f6f6a;"></span>Mira · last week</div></div>
+      <div class="card" style="opacity: 0.7;"><div class="t">Send first invoice</div><div class="m"><span class="dot" style="background: #b5573a;"></span>Jon · last week</div></div>
+    </div>
+
+  </div>
+
+  <div style="display: flex; justify-content: center; padding: 0 0 26px 0;">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: #1c1a17; color: #f7f4ee; border-radius: 4px; font-size: 13px;">
+      <span class="dot" style="background: #9fd8d3;"></span>Reconnected — 2 queued changes synced
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

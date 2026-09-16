@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif; }
+    a { color: var(--ok); } a:hover { color: var(--text); }
+    .mono { font-family: 'IBM Plex Mono', Menlo, monospace; }
+    .row { display: flex; align-items: center; gap: 10px; padding: 9px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 3px; font-size: 13px; color: var(--text); }
+    .row .id { font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 11px; color: var(--dim); width: 44px; flex-shrink: 0; }
+    .row .t { flex-grow: 1; }
+    .row .who { width: 18px; height: 18px; border-radius: 3px; font-size: 9.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; color: #101114; flex-shrink: 0; }
+    .colh { display: flex; align-items: center; justify-content: space-between; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 0 2px 8px 2px; }
+    .colh .c { font-family: 'IBM Plex Mono', Menlo, monospace; color: var(--dim); }
+    .log { display: flex; gap: 10px; font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 11px; color: var(--muted); }
+    .log .ts { color: var(--faint); }
+    .devbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; border-top: 1px solid var(--line); background: var(--well); cursor: pointer; user-select: none; }
+    .devbar .h { display: flex; align-items: center; gap: 10px; font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .pill { font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 10.5px; padding: 2px 7px; border-radius: 3px; border: 1px solid var(--border); color: var(--muted); }
+    .hpill { display: flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 11px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 3px; }
+    .who20 { width: 20px; height: 20px; border-radius: 3px; color: #101114; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+    .switch { display: flex; align-items: center; border: 1px solid var(--border); border-radius: 3px; overflow: hidden; cursor: pointer; user-select: none; }
+    .switch span { display: flex; align-items: center; justify-content: center; width: 28px; height: 24px; }
+  </style>
+</helmet>
+<div style="width: 1200px; height: 760px; box-sizing: border-box; background: {{t.bg}}; color: {{t.text}}; display: flex; flex-direction: column; overflow: hidden; --bg: {{t.bg}}; --surface: {{t.surface}}; --well: {{t.well}}; --border: {{t.border}}; --line: {{t.line}}; --text: {{t.text}}; --muted: {{t.muted}}; --dim: {{t.dim}}; --faint: {{t.faint}}; --ok: {{t.ok}}; --queued: {{t.queued}}; --info: {{t.info}}; --queuedBorder: {{t.queuedBorder}};">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--line);">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="{{t.ok}}" stroke-width="1.5"><path d="M2 5h12M2 8h8M2 11h10"></path></svg>Driftboard
+      </div>
+      <span class="mono" style="font-size: 12px; color: var(--dim);">/b/7f3k2</span>
+      <span style="font-size: 13px; color: var(--text);">Client site redesign</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <div class="who20" style="background: {{t.pMK}};">MK</div>
+        <div class="who20" style="background: {{t.pJO}};">JO</div>
+        <div class="who20" style="background: {{t.pA}};">A</div>
+        <span class="mono" style="font-size: 11px; color: var(--dim); margin-left: 4px;">3 online</span>
+      </div>
+      <div class="hpill" style="color: var(--ok);">
+        <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--ok);"></span>WS · 38 ms
+      </div>
+      <span class="mono" style="font-size: 11px; color: var(--muted);">guest:ada</span>
+      <div class="switch" onClick="{{ toggleTheme }}" title="Theme">
+        <span style="background: {{t.sunBg}};"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="{{t.sunFg}}" stroke-width="1.5"><circle cx="8" cy="8" r="3"></circle><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4"></path></svg></span>
+        <span style="background: {{t.moonBg}};"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="{{t.moonFg}}" stroke-width="1.5"><path d="M13.5 9.5A6 6 0 0 1 6.5 2.5a6 6 0 1 0 7 7z"></path></svg></span>
+      </div>
+      <div style="font-size: 12px; font-weight: 500; padding: 5px 10px; background: {{t.btnBg}}; color: {{t.btnFg}}; border-radius: 3px;">Sign in</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; padding: 16px 20px; flex-grow: 1; min-height: 0;">
+
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <div class="colh"><span>To do</span><span class="c">4</span></div>
+      <div class="row"><span class="id">DB-14</span><span class="t">Rewrite hero copy for the launch page</span><span class="who" style="background: {{t.pMK}};">MK</span></div>
+      <div class="row"><span class="id">DB-11</span><span class="t">Collect logo files from the client</span><span class="who" style="background: {{t.pA}};">A</span></div>
+      <div class="row"><span class="id">DB-09</span><span class="t">Decide on the pricing table layout</span><span class="who" style="background: {{t.pJO}};">JO</span></div>
+      <div class="row"><span class="id">DB-07</span><span class="t">Set up staging domain</span><span class="who" style="background: {{t.pA}};">A</span></div>
+      <div class="mono" style="font-size: 11px; color: var(--faint); padding: 6px 10px;">+ new · N</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <div class="colh"><span>In progress</span><span class="c">2</span></div>
+      <div class="row" style="border-color: var(--ok);"><span class="id">DB-13</span><span class="t">Build responsive nav</span><span class="mono" style="font-size: 10.5px; color: var(--ok);">MK editing</span><span class="who" style="background: {{t.pMK}};">MK</span></div>
+      <div class="row" style="border-style: dashed; border-color: var(--queued); opacity: 0.85;"><span class="id">DB-12</span><span class="t">Photograph the workshop</span><span class="mono" style="font-size: 10.5px; color: var(--queued);">queued</span><span class="who" style="background: {{t.pA}};">A</span></div>
+      <div class="mono" style="font-size: 11px; color: var(--faint); padding: 6px 10px;">+ new · N</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <div class="colh"><span>Done</span><span class="c">3</span></div>
+      <div class="row" style="color: var(--muted);"><span class="id">DB-03</span><span class="t">Agree on scope and timeline</span><span class="who" style="background: {{t.pA}};">A</span></div>
+      <div class="row" style="color: var(--muted);"><span class="id">DB-02</span><span class="t">Choose type pairing</span><span class="who" style="background: {{t.pMK}};">MK</span></div>
+      <div class="row" style="color: var(--muted);"><span class="id">DB-01</span><span class="t">Send first invoice</span><span class="who" style="background: {{t.pJO}};">JO</span></div>
+    </div>
+
+  </div>
+
+  <div class="devbar" onClick="{{ toggle }}">
+    <div class="h">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="{{t.muted}}" stroke-width="1.5" style="transform: {{ chevron }};"><path d="M2 4l4 4 4-4"></path></svg>
+      <span>Sync log</span>
+      <span class="pill">3 events</span>
+      <sc-if value="{{ collapsed }}" hint-placeholder-val="{{ false }}">
+        <span style="color: var(--faint); letter-spacing: 0; text-transform: none;">last · card.moved DB-13 by MK · 14:02:11</span>
+      </sc-if>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span class="pill" style="color: var(--queued); border-color: var(--queuedBorder);">1 queued</span>
+      <span class="pill">⌘ .</span>
+    </div>
+  </div>
+
+  <sc-if value="{{ open }}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; flex-direction: column; gap: 5px; padding: 6px 20px 12px 20px; background: var(--well);">
+      <div class="log"><span class="ts">14:02:11</span><span style="color: var(--ok);">card.moved</span><span>DB-13 → in_progress</span><span class="ts">by MK · applied</span></div>
+      <div class="log"><span class="ts">14:02:09</span><span style="color: var(--queued);">card.updated</span><span>DB-12 title</span><span class="ts">by you · queued (offline 00:14)</span></div>
+      <div class="log"><span class="ts">14:01:40</span><span style="color: var(--info);">card.updated</span><span>DB-14 title</span><span class="ts">conflict · version mismatch · yours dropped</span></div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark","section":"Theme"},"devtools":{"editor":"boolean","default":true,"section":"Sync log"},"$preview":{"width":1200,"height":760}}'>
+const THEMES = {
+  dark: {
+    bg: '#121317', surface: '#1b1d22', well: '#0e0f12', border: '#2a2d34', line: '#23262d',
+    text: '#e6e4df', muted: '#9aa0ab', dim: '#7d8390', faint: '#5f6570',
+    ok: '#b7f26a', queued: '#ffb86b', info: '#8fb8ff', queuedBorder: '#4a3a22',
+    pMK: '#b7f26a', pJO: '#ffb86b', pA: '#8fb8ff',
+    btnBg: '#e6e4df', btnFg: '#101114',
+    sunBg: 'transparent', sunFg: '#7d8390', moonBg: '#2a2d34', moonFg: '#e6e4df',
+  },
+  light: {
+    bg: '#f3f4f2', surface: '#ffffff', well: '#e9ebe8', border: '#d6d9d5', line: '#dfe2de',
+    text: '#1c1b19', muted: '#5f6570', dim: '#8a8f98', faint: '#a3a8b0',
+    ok: '#3f7d12', queued: '#b25f0b', info: '#2b5fc9', queuedBorder: '#ead2b3',
+    pMK: '#b7f26a', pJO: '#ffb86b', pA: '#8fb8ff',
+    btnBg: '#1c1b19', btnFg: '#f3f4f2',
+    sunBg: '#d6d9d5', sunFg: '#1c1b19', moonBg: 'transparent', moonFg: '#8a8f98',
+  },
+};
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const theme = s.theme || this.props.theme || 'dark';
+    const open = typeof s.open === 'boolean' ? s.open : (this.props.devtools ?? true);
+    return {
+      t: THEMES[theme] || THEMES.dark,
+      open,
+      collapsed: !open,
+      chevron: open ? 'rotate(0deg)' : 'rotate(-90deg)',
+      toggle: () => this.setState({ open: !open }),
+      toggleTheme: () => this.setState({ theme: theme === 'dark' ? 'light' : 'dark' }),
+    };
+  }
+}
+</script>
+</body>
+</html>

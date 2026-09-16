@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif; }
+    a { color: #1d4ed8; } a:hover { color: #1e3a8a; }
+    .k { font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: #6b6660; }
+    .box { box-sizing: border-box; border: 1.5px solid #1f1d1a; border-radius: 6px; background: #fff; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; line-height: 1.3; color: #1f1d1a; }
+    .box .t { font-weight: 600; font-size: 14px; }
+    .box ul { margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 3px; }
+    .srv { background: #e8eef9; border-color: #1e3a8a; }
+    .srv .k { color: #1e3a8a; }
+    .db { background: #e6f2ee; border-color: #1f5f4a; }
+    .db .k { color: #1f5f4a; }
+    .lbl { position: absolute; font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 11px; color: #3f3b36; background: #f6f4ef; padding: 0 4px; }
+  </style>
+</helmet>
+<div style="position: relative; width: 1420px; height: 780px; background: #f6f4ef; overflow: hidden;">
+
+  <div style="position: absolute; left: 40px; top: 20px; display: flex; align-items: baseline; gap: 14px;">
+    <div style="font-size: 20px; font-weight: 600; color: #1f1d1a;">Driftboard — system architecture</div>
+    <div style="font-size: 13px; color: #6b6660;">one always-on Node process serving a GraphQL schema over one socket, Postgres as the single source of truth, events as notify-only</div>
+  </div>
+
+  <svg width="1420" height="780" style="position: absolute; left: 0; top: 0;" viewBox="0 0 1420 780" fill="none" stroke="#1f1d1a" stroke-width="1.5">
+    <defs>
+      <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f1d1a" stroke="none"></path>
+      </marker>
+    </defs>
+    <path d="M 340 150 L 470 150" marker-start="url(#ah)" marker-end="url(#ah)"></path>
+    <path d="M 340 250 L 470 250" marker-start="url(#ah)" marker-end="url(#ah)"></path>
+    <path d="M 340 460 L 470 460" marker-start="url(#ah)" marker-end="url(#ah)"></path>
+    <path d="M 340 560 L 470 560" marker-start="url(#ah)" marker-end="url(#ah)"></path>
+    <path d="M 950 190 L 1090 190" marker-start="url(#ah)" marker-end="url(#ah)"></path>
+    <path d="M 950 350 L 1030 350 L 1030 190"></path>
+    <path d="M 950 510 L 1030 510 L 1030 190"></path>
+    <path d="M 710 288 L 710 320" marker-end="url(#ah)" stroke-dasharray="4 4"></path>
+  </svg>
+
+  <div class="lbl" style="left: 350px; top: 132px;">HTTPS · session mutations</div>
+  <div class="lbl" style="left: 346px; top: 232px;">WSS · queries · mutations · events</div>
+  <div class="lbl" style="left: 350px; top: 442px;">HTTPS · session mutations</div>
+  <div class="lbl" style="left: 346px; top: 542px;">WSS · queries · mutations · events</div>
+  <div class="lbl" style="left: 968px; top: 172px;">SQL (pg)</div>
+  <div class="lbl" style="left: 722px; top: 296px;">notify after write</div>
+
+  <div class="box" style="position: absolute; left: 40px; top: 90px; width: 300px; height: 210px;">
+    <span class="k">browser · client A</span>
+    <span class="t">React + TypeScript + Vite</span>
+    <ul>
+      <li>Apollo InMemoryCache — boards / columns / cards / peers</li>
+      <li>Link chain: lag? → log → queue → split(session → http, else → ws)</li>
+      <li>MobX sync store — connection, offline queue (parked ops, rebased on replay), log, toasts</li>
+      <li>graphql-ws — one socket for queries, mutations, boardEvents</li>
+      <li>Signed session cookie — guest or account</li>
+    </ul>
+  </div>
+
+  <div class="box" style="position: absolute; left: 40px; top: 400px; width: 300px; height: 210px;">
+    <span class="k">browser · client B … N</span>
+    <span class="t">Same bundle, same store</span>
+    <ul>
+      <li>Receives broadcast events for its board</li>
+      <li>Events write into its Apollo cache via cache.modify, no refetch</li>
+      <li>Own optimistic + offline path</li>
+    </ul>
+  </div>
+
+  <div class="box srv" style="position: absolute; left: 470px; top: 90px; width: 480px; height: 198px;">
+    <span class="k">node process · fastify + mercurius</span>
+    <span class="t">GraphQL — Query + Mutation resolvers</span>
+    <ul>
+      <li><span style="font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 12px;">board(slug) · viewer</span> — canonical snapshot, live cards only</li>
+      <li><span style="font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 12px;">createBoard · createCard · updateCard(baseVersion) · moveCard(position) · deleteCard</span> — each with opId</li>
+      <li><span style="font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 12px;">startGuestSession · logIn · signUp · logOut</span> — HTTP, they set the cookie</li>
+      <li>Moves are last-write-wins; text edits are version-checked. One transaction + ops row per mutation</li>
+    </ul>
+  </div>
+
+  <div class="box srv" style="position: absolute; left: 470px; top: 320px; width: 480px; height: 170px;">
+    <span class="k">same process</span>
+    <span class="t">Subscriptions (graphql-ws)</span>
+    <ul>
+      <li><span style="font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 12px;">boardEvents(boardId)</span> — in-process pubsub, one topic per board</li>
+      <li>Publishes <span style="font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 12px;">CardCreated / CardUpdated / CardMoved { cards[] } / CardDeleted</span> after commit — a reindex is a multi-card move</li>
+      <li><span style="font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 12px;">PresenceChanged</span> — in-memory map, who's here and what they view; <span style="font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 12px;">setViewing</span> never touches Postgres</li>
+    </ul>
+  </div>
+
+  <div class="box srv" style="position: absolute; left: 470px; top: 500px; width: 480px; height: 110px;">
+    <span class="k">same process · milestone 8</span>
+    <span class="t">Auth (additive, never a gate)</span>
+    <ul>
+      <li>Signed session cookie; a guest session is a display name and a colour</li>
+      <li>Login sets <span style="font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 12px;">Session.userId</span> on the same row; resolvers and subscriptions are otherwise identical</li>
+    </ul>
+  </div>
+
+  <div class="box db" style="position: absolute; left: 1090px; top: 90px; width: 290px; height: 200px;">
+    <span class="k">postgres · single source of truth</span>
+    <span class="t">Tables</span>
+    <ul>
+      <li><span style="font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 12px;">boards · columns · cards · sessions · users · ops</span></li>
+      <li><span style="font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 12px;">cards.version</span> — text conflicts only · <span style="font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 12px;">cards.position</span> — the one order</li>
+      <li><span style="font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 12px;">cards.deleted_at</span> — soft delete · <span style="font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 12px;">ops(opId, result)</span> — idempotency ledger</li>
+    </ul>
+  </div>
+
+  <div class="box" style="position: absolute; left: 1090px; top: 320px; width: 290px; height: 130px; border-style: dashed;">
+    <span class="k">deploy</span>
+    <span class="t">Render / Railway / Fly.io</span>
+    <ul>
+      <li>One always-on Node service + managed Postgres; web bundle served from the same origin</li>
+      <li>Single instance: no k8s, no GCP, no Redis — named non-goals</li>
+    </ul>
+  </div>
+
+  <div style="position: absolute; left: 1090px; top: 480px; width: 290px; display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; color: #3f3b36; line-height: 1.4;">
+    <div style="font-weight: 600; color: #1f1d1a;">Invariants</div>
+    <div>Every card mutation goes through the same resolver → policy → one transaction → broadcast path whether it came from optimistic UI, offline replay or a direct API call. setViewing is the one exception: presence is not domain data.</div>
+    <div>The event layer never stores domain state — it only tells peers that Postgres changed. On the client, Apollo's cache owns domain data and MobX owns the sync engine; nothing lives in both.</div>
+  </div>
+
+  <div style="position: absolute; left: 40px; top: 660px; display: flex; gap: 18px; font-size: 12px; color: #3f3b36;">
+    <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 14px; height: 10px; border: 1.5px solid #1f1d1a; background: #fff; border-radius: 2px;"></span>client</div>
+    <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 14px; height: 10px; border: 1.5px solid #1e3a8a; background: #e8eef9; border-radius: 2px;"></span>server (one process)</div>
+    <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 14px; height: 10px; border: 1.5px solid #1f5f4a; background: #e6f2ee; border-radius: 2px;"></span>database</div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

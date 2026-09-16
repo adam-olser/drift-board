@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif; }
+    a { color: var(--ok); } a:hover { color: var(--text); }
+    .mono { font-family: 'IBM Plex Mono', Menlo, monospace; }
+    .sec { display: flex; flex-direction: column; gap: 10px; }
+    .sec .h { font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+    .lab { font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 10.5px; color: var(--faint); width: 120px; flex-shrink: 0; }
+    .ex { display: flex; align-items: center; gap: 14px; }
+    .btn { font-size: 12px; font-weight: 500; padding: 6px 12px; border-radius: 3px; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary { background: var(--btnBg); color: var(--btnFg); }
+    .btn-accent { background: #b7f26a; color: #101114; }
+    .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--borderStrong); }
+    .btn-ghost { background: transparent; color: var(--muted); }
+    .btn-danger { background: transparent; color: var(--error); border: 1px solid var(--errorBorder); }
+    .row { display: flex; align-items: center; gap: 10px; padding: 9px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 3px; font-size: 13px; color: var(--text); width: 420px; box-sizing: border-box; }
+    .row .id { font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 11px; color: var(--dim); width: 44px; flex-shrink: 0; }
+    .row .t { flex-grow: 1; }
+    .row .st { font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 10.5px; }
+    .who { width: 18px; height: 18px; border-radius: 3px; font-size: 9.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; color: #101114; flex-shrink: 0; }
+    .pill { font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 11px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 3px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+    .toast { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--surface); border: 1px solid var(--borderStrong); border-left-width: 2px; border-radius: 3px; font-size: 12.5px; color: var(--text); width: 420px; box-sizing: border-box; }
+    .toast .a { margin-left: auto; font-size: 12px; color: var(--muted); }
+    .input { font-size: 13px; padding: 7px 10px; background: var(--well); border: 1px solid var(--border); border-radius: 3px; color: var(--text); width: 280px; box-sizing: border-box; }
+    .log { display: flex; gap: 10px; font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 11px; color: var(--muted); }
+    .log .ts { color: var(--faint); }
+    .sw { display: flex; flex-direction: column; gap: 4px; width: 92px; }
+    .sw div:first-child { height: 34px; border-radius: 3px; border: 1px solid var(--border); }
+    .sw span { font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 10px; color: var(--dim); }
+    .note { font-size: 12px; color: var(--muted); }
+    .switch { display: flex; align-items: center; border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+    .switch span { display: flex; align-items: center; justify-content: center; width: 28px; height: 24px; }
+  </style>
+</helmet>
+<div style="width: 1200px; height: 1060px; box-sizing: border-box; background: {{t.bg}}; color: {{t.text}}; padding: 24px 28px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 40px; overflow: hidden; align-content: start; --bg: {{t.bg}}; --surface: {{t.surface}}; --well: {{t.well}}; --border: {{t.border}}; --borderStrong: {{t.borderStrong}}; --line: {{t.line}}; --text: {{t.text}}; --muted: {{t.muted}}; --dim: {{t.dim}}; --faint: {{t.faint}}; --ok: {{t.ok}}; --queued: {{t.queued}}; --queuedBorder: {{t.queuedBorder}}; --info: {{t.info}}; --error: {{t.error}}; --errorBorder: {{t.errorBorder}}; --btnBg: {{t.btnBg}}; --btnFg: {{t.btnFg}};">
+
+  <div class="sec" style="grid-column: 1 / span 2;">
+    <div class="h">Tokens · dark</div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <div class="sw"><div style="background: #121317;"></div><span>bg 121317</span></div>
+      <div class="sw"><div style="background: #1b1d22;"></div><span>surface 1b1d22</span></div>
+      <div class="sw"><div style="background: #0e0f12;"></div><span>well 0e0f12</span></div>
+      <div class="sw"><div style="background: #2a2d34;"></div><span>border 2a2d34</span></div>
+      <div class="sw"><div style="background: #e6e4df;"></div><span>text e6e4df</span></div>
+      <div class="sw"><div style="background: #9aa0ab;"></div><span>muted 9aa0ab</span></div>
+      <div class="sw"><div style="background: #5f6570;"></div><span>faint 5f6570</span></div>
+      <div class="sw"><div style="background: #b7f26a;"></div><span>ok b7f26a</span></div>
+      <div class="sw"><div style="background: #ffb86b;"></div><span>queued ffb86b</span></div>
+      <div class="sw"><div style="background: #8fb8ff;"></div><span>info 8fb8ff</span></div>
+      <div class="sw"><div style="background: #ff7b72;"></div><span>error ff7b72</span></div>
+    </div>
+    <div class="h">Tokens · light</div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <div class="sw"><div style="background: #f3f4f2;"></div><span>bg f3f4f2</span></div>
+      <div class="sw"><div style="background: #ffffff;"></div><span>surface ffffff</span></div>
+      <div class="sw"><div style="background: #e9ebe8;"></div><span>well e9ebe8</span></div>
+      <div class="sw"><div style="background: #d6d9d5;"></div><span>border d6d9d5</span></div>
+      <div class="sw"><div style="background: #1c1b19;"></div><span>text 1c1b19</span></div>
+      <div class="sw"><div style="background: #5f6570;"></div><span>muted 5f6570</span></div>
+      <div class="sw"><div style="background: #a3a8b0;"></div><span>faint a3a8b0</span></div>
+      <div class="sw"><div style="background: #3f7d12;"></div><span>ok 3f7d12</span></div>
+      <div class="sw"><div style="background: #b25f0b;"></div><span>queued b25f0b</span></div>
+      <div class="sw"><div style="background: #2b5fc9;"></div><span>info 2b5fc9</span></div>
+      <div class="sw"><div style="background: #c0392b;"></div><span>error c0392b</span></div>
+    </div>
+    <div style="display: flex; gap: 28px; align-items: center;">
+      <div class="switch"><span style="background: {{t.sunBg}};"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="{{t.sunFg}}" stroke-width="1.5"><circle cx="8" cy="8" r="3"></circle><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4"></path></svg></span><span style="background: {{t.moonBg}};"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="{{t.moonFg}}" stroke-width="1.5"><path d="M13.5 9.5A6 6 0 0 1 6.5 2.5a6 6 0 1 0 7 7z"></path></svg></span></div>
+      <span class="note">Theme switch lives in the header. User choice persists in localStorage; default follows the OS. Presence colours (MK lime, JO amber, A blue) are identical in both themes; status hues darken in light for contrast on white.</span>
+    </div>
+    <div style="display: flex; gap: 28px;" class="note">
+      <span><span style="color: var(--text); font-weight: 600;">IBM Plex Sans</span> 13 / 12 / 11 — UI text</span>
+      <span class="mono"><span style="color: var(--text);">IBM Plex Mono</span> 11 / 10.5 — ids, states, log, pills</span>
+      <span>Radius 3 · borders 1px · row padding 9×10 · column gap 14</span>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="h">Buttons</div>
+    <div class="ex"><span class="lab">primary</span><span class="btn btn-primary">Sign in</span><span class="btn btn-primary">Save</span></div>
+    <div class="ex"><span class="lab">accent (rare)</span><span class="btn btn-accent">Create board</span></div>
+    <div class="ex"><span class="lab">secondary</span><span class="btn btn-secondary">Cancel</span><span class="btn btn-secondary">Copy link</span></div>
+    <div class="ex"><span class="lab">ghost</span><span class="btn btn-ghost">+ new · N</span><span class="btn btn-ghost">Continue as guest</span></div>
+    <div class="ex"><span class="lab">danger</span><span class="btn btn-danger">Delete card</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="h">Pills · sync state</div>
+    <div class="ex"><span class="lab">online</span><span class="pill" style="color: var(--ok);"><span class="dot" style="background: var(--ok);"></span>WS · 38 ms</span></div>
+    <div class="ex"><span class="lab">syncing</span><span class="pill" style="color: var(--info);"><span class="dot" style="background: var(--info);"></span>Syncing 2 / 3</span></div>
+    <div class="ex"><span class="lab">offline</span><span class="pill" style="color: var(--queued); border-color: var(--queuedBorder);"><span class="dot" style="background: var(--queued);"></span>Offline · 00:42</span></div>
+    <div class="ex"><span class="lab">queued count</span><span class="pill" style="color: var(--queued); border-color: var(--queuedBorder);">2 queued</span><span class="pill">3 events</span><span class="pill">⌘ .</span></div>
+    <div class="ex"><span class="lab">presence</span><div style="display: flex; align-items: center; gap: 6px;"><span class="who" style="background: #b7f26a; width: 20px; height: 20px;">MK</span><span class="who" style="background: #ffb86b; width: 20px; height: 20px;">JO</span><span class="who" style="background: #8fb8ff; width: 20px; height: 20px;">A</span><span class="mono" style="font-size: 11px; color: var(--dim);">3 online</span></div></div>
+  </div>
+
+  <div class="sec">
+    <div class="h">Card row · states</div>
+    <div class="ex"><span class="lab">default</span><div class="row"><span class="id">DB-14</span><span class="t">Rewrite hero copy for the launch page</span><span class="who" style="background: #b7f26a;">MK</span></div></div>
+    <div class="ex"><span class="lab">hover</span><div class="row" style="border-color: var(--borderStrong); background: var(--well);"><span class="id">DB-14</span><span class="t">Rewrite hero copy for the launch page</span><span class="who" style="background: #b7f26a;">MK</span></div></div>
+    <div class="ex"><span class="lab">dragging</span><div class="row" style="border-color: var(--text); box-shadow: 0 8px 24px {{t.shadow}}; transform: rotate(-0.5deg);"><span class="id">DB-14</span><span class="t">Rewrite hero copy for the launch page</span><span class="who" style="background: #b7f26a;">MK</span></div></div>
+    <div class="ex"><span class="lab">peer editing</span><div class="row" style="border-color: var(--ok);"><span class="id">DB-13</span><span class="t">Build responsive nav</span><span class="st" style="color: var(--ok);">MK editing</span><span class="who" style="background: #b7f26a;">MK</span></div></div>
+    <div class="ex"><span class="lab">optimistic</span><div class="row" style="border-color: var(--borderStrong);"><span class="id">DB-15</span><span class="t">Add favicon</span><span class="st" style="color: var(--dim);">saving…</span><span class="who" style="background: #8fb8ff;">A</span></div></div>
+    <div class="ex"><span class="lab">queued (offline)</span><div class="row" style="border-style: dashed; border-color: var(--queued); opacity: 0.85;"><span class="id">DB-12</span><span class="t">Photograph the workshop</span><span class="st" style="color: var(--queued);">queued</span><span class="who" style="background: #8fb8ff;">A</span></div></div>
+    <div class="ex"><span class="lab">superseded</span><div class="row" style="border-color: var(--error);"><span class="id">DB-14</span><span class="t">Rewrite hero copy for launch</span><span class="st" style="color: var(--error);">reverted</span><span class="who" style="background: #8fb8ff;">A</span></div></div>
+    <div class="ex"><span class="lab">done</span><div class="row" style="color: var(--muted);"><span class="id">DB-03</span><span class="t">Agree on scope and timeline</span><span class="who" style="background: #8fb8ff;">A</span></div></div>
+    <div class="ex"><span class="lab">drop target</span><div class="row" style="border-style: dashed; border-color: var(--borderStrong); background: transparent; color: var(--faint); justify-content: center;">Drop here</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="h">Toasts · from the MobX sync store</div>
+    <div class="ex"><span class="lab">reconnected</span><div class="toast" style="border-left-color: var(--ok);"><span class="dot" style="background: var(--ok);"></span>Back online — 2 queued changes synced<span class="a">Dismiss</span></div></div>
+    <div class="ex"><span class="lab">conflict</span><div class="toast" style="border-left-color: var(--queued);"><span class="dot" style="background: var(--queued);"></span>“Rewrite hero copy” was changed by Mira — your edit was reverted<span class="a">View</span></div></div>
+    <div class="ex"><span class="lab">gone</span><div class="toast" style="border-left-color: var(--error);"><span class="dot" style="background: var(--error);"></span>“Set up staging domain” was deleted by Jon<span class="a">OK</span></div></div>
+    <div class="ex"><span class="lab">offline</span><div class="toast" style="border-left-color: var(--queued);"><span class="dot" style="background: var(--queued);"></span>You're offline — edits are kept and will sync on reconnect</div></div>
+
+    <div class="h" style="margin-top: 14px;">Inputs</div>
+    <div class="ex"><span class="lab">text</span><div class="input">Client site redesign</div></div>
+    <div class="ex"><span class="lab">focused</span><div class="input" style="border-color: var(--text);">Rewrite hero copy for the launch p<span style="border-left: 1px solid var(--text); margin-left: 1px;"></span></div></div>
+    <div class="ex"><span class="lab">error</span><div style="display: flex; flex-direction: column; gap: 4px;"><div class="input" style="border-color: var(--error);">ada@</div><span class="mono" style="font-size: 10.5px; color: var(--error);">Enter a full email address</span></div></div>
+
+    <div class="h" style="margin-top: 14px;">Sync log rows</div>
+    <div class="log"><span class="ts">14:02:11</span><span style="color: var(--ok);">card.moved</span><span>DB-13 → in_progress</span><span class="ts">by MK · applied</span></div>
+    <div class="log"><span class="ts">14:02:09</span><span style="color: var(--queued);">card.updated</span><span>DB-12 title</span><span class="ts">by you · queued (offline 00:14)</span></div>
+    <div class="log"><span class="ts">14:01:40</span><span style="color: var(--info);">card.updated</span><span>DB-14 title</span><span class="ts">conflict · version mismatch · yours dropped</span></div>
+    <div class="log"><span class="ts">14:01:02</span><span style="color: var(--error);">card.deleted</span><span>DB-07</span><span class="ts">by JO · evicted from cache</span></div>
+    <div class="log"><span class="ts">14:00:58</span><span style="color: var(--muted);">ws.reconnected</span><span>resync board(slug) network-only</span><span class="ts">412 ms</span></div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark","section":"Theme"},"$preview":{"width":1200,"height":1060}}'>
+const THEMES = {
+  dark:  { bg: '#121317', surface: '#1b1d22', well: '#0e0f12', border: '#2a2d34', borderStrong: '#3a3e47', line: '#23262d', text: '#e6e4df', muted: '#9aa0ab', dim: '#7d8390', faint: '#5f6570', ok: '#b7f26a', queued: '#ffb86b', queuedBorder: '#4a3a22', info: '#8fb8ff', error: '#ff7b72', errorBorder: '#4a2a28', btnBg: '#e6e4df', btnFg: '#101114', shadow: 'rgba(0,0,0,0.5)', sunBg: 'transparent', sunFg: '#7d8390', moonBg: '#2a2d34', moonFg: '#e6e4df' },
+  light: { bg: '#f3f4f2', surface: '#ffffff', well: '#e9ebe8', border: '#d6d9d5', borderStrong: '#b8bcb7', line: '#dfe2de', text: '#1c1b19', muted: '#5f6570', dim: '#8a8f98', faint: '#a3a8b0', ok: '#3f7d12', queued: '#b25f0b', queuedBorder: '#ead2b3', info: '#2b5fc9', error: '#c0392b', errorBorder: '#f0c2bc', btnBg: '#1c1b19', btnFg: '#f3f4f2', shadow: 'rgba(20,22,26,0.18)', sunBg: '#d6d9d5', sunFg: '#1c1b19', moonBg: 'transparent', moonFg: '#8a8f98' },
+};
+class Component extends DCLogic {
+  renderVals() {
+    const theme = this.props.theme || 'dark';
+    return { t: THEMES[theme] || THEMES.dark };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif; }
+    a { color: var(--ok); } a:hover { color: var(--text); }
+    .mono { font-family: 'IBM Plex Mono', Menlo, monospace; }
+    .row { display: flex; align-items: center; gap: 10px; padding: 12px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 3px; font-size: 14px; color: var(--text); min-height: 48px; box-sizing: border-box; }
+    .row .id { font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 11px; color: var(--dim); width: 44px; flex-shrink: 0; }
+    .row .t { flex-grow: 1; line-height: 1.3; }
+    .who { width: 20px; height: 20px; border-radius: 3px; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; color: #101114; flex-shrink: 0; }
+    .tab { flex: 1; text-align: center; font-size: 12px; padding: 10px 0; color: var(--muted); border-bottom: 2px solid transparent; display: flex; justify-content: center; gap: 6px; align-items: baseline; }
+    .tab .c { font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 10.5px; color: var(--dim); }
+    .switch { display: flex; align-items: center; border: 1px solid var(--border); border-radius: 3px; overflow: hidden; cursor: pointer; user-select: none; }
+    .switch span { display: flex; align-items: center; justify-content: center; width: 26px; height: 22px; }
+  </style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: {{t.bg}}; color: {{t.text}}; display: flex; flex-direction: column; overflow: hidden; padding-top: 54px; --bg: {{t.bg}}; --surface: {{t.surface}}; --well: {{t.well}}; --border: {{t.border}}; --line: {{t.line}}; --text: {{t.text}}; --muted: {{t.muted}}; --dim: {{t.dim}}; --faint: {{t.faint}}; --ok: {{t.ok}}; --queued: {{t.queued}};">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 16px 10px 16px;">
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+      <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="{{t.ok}}" stroke-width="1.5"><path d="M2 5h12M2 8h8M2 11h10"></path></svg>Driftboard</div>
+      <span style="font-size: 13px; color: var(--muted);">Client site redesign</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div style="display: flex; gap: 4px;"><span class="who" style="background: #b7f26a;">MK</span><span class="who" style="background: #ffb86b;">JO</span><span class="who" style="background: #8fb8ff;">A</span></div>
+      <div class="switch" onClick="{{ toggleTheme }}">
+        <span style="background: {{t.sunBg}};"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="{{t.sunFg}}" stroke-width="1.5"><circle cx="8" cy="8" r="3"></circle><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4"></path></svg></span>
+        <span style="background: {{t.moonBg}};"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="{{t.moonFg}}" stroke-width="1.5"><path d="M13.5 9.5A6 6 0 0 1 6.5 2.5a6 6 0 1 0 7 7z"></path></svg></span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; border-bottom: 1px solid var(--line); padding: 0 8px;">
+    <div class="tab"><span>To do</span><span class="c">4</span></div>
+    <div class="tab" style="color: var(--text); border-bottom-color: var(--text);"><span>In progress</span><span class="c">2</span></div>
+    <div class="tab"><span>Done</span><span class="c">3</span></div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; flex-grow: 1; min-height: 0;">
+    <div class="row" style="border-color: var(--ok);"><span class="id">DB-13</span><span class="t">Build responsive nav</span><span class="mono" style="font-size: 10.5px; color: var(--ok);">MK</span><span class="who" style="background: #b7f26a;">MK</span></div>
+    <div class="row" style="border-style: dashed; border-color: var(--queued); opacity: 0.85;"><span class="id">DB-12</span><span class="t">Photograph the workshop</span><span class="mono" style="font-size: 10.5px; color: var(--queued);">queued</span><span class="who" style="background: #8fb8ff;">A</span></div>
+    <div class="row" style="border-style: dashed; border-color: var(--border); background: transparent; color: var(--faint); justify-content: center; font-size: 13px;">Long-press a card to move it</div>
+    <div class="mono" style="font-size: 11px; color: var(--faint); padding: 8px 4px;">+ new card</div>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--well); padding-bottom: 28px;">
+    <div style="display: flex; align-items: center; gap: 10px; font-family: 'IBM Plex Mono', Menlo, monospace; font-size: 11px; color: var(--muted);">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="{{t.muted}}" stroke-width="1.5" style="transform: rotate(-90deg);"><path d="M2 4l4 4 4-4"></path></svg>
+      <span>Sync log</span>
+      <span style="color: var(--queued);">1 queued</span>
+    </div>
+    <span class="mono" style="font-size: 11px; color: var(--muted);">guest:ada</span>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark","section":"Theme"},"$preview":{"width":390,"height":844}}'>
+const THEMES = {
+  dark:  { bg: '#121317', surface: '#1b1d22', well: '#0e0f12', border: '#2a2d34', line: '#23262d', text: '#e6e4df', muted: '#9aa0ab', dim: '#7d8390', faint: '#5f6570', ok: '#b7f26a', queued: '#ffb86b', sunBg: 'transparent', sunFg: '#7d8390', moonBg: '#2a2d34', moonFg: '#e6e4df' },
+  light: { bg: '#f3f4f2', surface: '#ffffff', well: '#e9ebe8', border: '#d6d9d5', line: '#dfe2de', text: '#1c1b19', muted: '#5f6570', dim: '#8a8f98', faint: '#a3a8b0', ok: '#3f7d12', queued: '#b25f0b', sunBg: '#d6d9d5', sunFg: '#1c1b19', moonBg: 'transparent', moonFg: '#8a8f98' },
+};
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const theme = s.theme || this.props.theme || 'dark';
+    return { t: THEMES[theme] || THEMES.dark, toggleTheme: () => this.setState({ theme: theme === 'dark' ? 'light' : 'dark' }) };
+  }
+}
+</script>
+</body>
+</html>

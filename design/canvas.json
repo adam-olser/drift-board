@@ -1,0 +1,191 @@
+{
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "Driftboard"
+    },
+    {
+      "id": "page-2",
+      "name": "Unchosen directions"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "Architecture.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1420,
+      "h": 780,
+      "title": "System architecture",
+      "page": "page-1"
+    },
+    {
+      "file": "Flow.dc.html",
+      "x": 1520,
+      "y": 0,
+      "w": 1420,
+      "h": 880,
+      "title": "App flow",
+      "page": "page-1"
+    },
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 1020,
+      "w": 1200,
+      "h": 760,
+      "title": "Board — desktop",
+      "page": "page-1",
+      "is_interactive": true
+    },
+    {
+      "file": "CardDetail.dc.html",
+      "x": 1300,
+      "y": 1020,
+      "w": 520,
+      "h": 760,
+      "title": "Card detail panel",
+      "page": "page-1"
+    },
+    {
+      "file": "Mobile.dc.html",
+      "x": 1920,
+      "y": 1020,
+      "w": 390,
+      "h": 844,
+      "title": "Board — phone",
+      "page": "page-1"
+    },
+    {
+      "file": "HeaderStates.dc.html",
+      "x": 0,
+      "y": 2020,
+      "w": 1200,
+      "h": 620,
+      "title": "Header — sync states",
+      "page": "page-1"
+    },
+    {
+      "file": "SignIn.dc.html",
+      "x": 1300,
+      "y": 2020,
+      "w": 1000,
+      "h": 640,
+      "title": "Guest name · sign in · my boards",
+      "page": "page-1"
+    },
+    {
+      "file": "Components.dc.html",
+      "x": 0,
+      "y": 2800,
+      "w": 1200,
+      "h": 1060,
+      "title": "Components",
+      "page": "page-1"
+    },
+    {
+      "file": "DirectionA.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1200,
+      "h": 760,
+      "title": "Option A — Paper & ink",
+      "page": "page-2"
+    },
+    {
+      "file": "DirectionC.dc.html",
+      "x": 1300,
+      "y": 0,
+      "w": 1200,
+      "h": 760,
+      "title": "Option C — Sticky notes",
+      "page": "page-2"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "note-arch",
+      "x": 0,
+      "y": -110,
+      "w": 420,
+      "page": "page-1",
+      "text": "System architecture: what runs where. Client (Apollo cache + MobX sync store + link chain) ↔ one always-on Node process (GraphQL over one socket, session HTTP, in-memory pubsub + presence) ↔ Postgres. Moves are last-write-wins, text edits are version-checked."
+    },
+    {
+      "id": "note-flow",
+      "x": 1520,
+      "y": -110,
+      "w": 420,
+      "page": "page-1",
+      "text": "App flow: what happens over time. Entry → optimistic layer → offline branch (lane 3: park, replay in order with baseVersion rebase, refetch) → server sync (lane 4). Dashed drop is the single rollback case."
+    },
+    {
+      "id": "note-main",
+      "x": 0,
+      "y": 910,
+      "w": 420,
+      "page": "page-1",
+      "text": "Desktop board. Click the sun/moon switch in the header to flip light/dark (the 'Theme' tweak sets the default). The sync log is a collapsible dev panel fed by logLink; click the bar to fold it."
+    },
+    {
+      "id": "note-detail",
+      "x": 1300,
+      "y": 910,
+      "w": 380,
+      "page": "page-1",
+      "text": "Card detail slides in from the right over the board (520 wide). Title/description save on ⌘↵ with baseVersion → optimistic concurrency, the earlier writer wins. History rows come from the same sync log."
+    },
+    {
+      "id": "note-mobile",
+      "x": 1920,
+      "y": 910,
+      "w": 380,
+      "page": "page-1",
+      "text": "Phone: one column at a time with tabs; long-press to move a card (the move sheet picks the column). Sync log collapses to the bottom bar. No fake status bar drawn."
+    },
+    {
+      "id": "note-header",
+      "x": 0,
+      "y": 1930,
+      "w": 420,
+      "page": "page-1",
+      "text": "Header in the four sync states from the MobX store: online (guest / signed in), offline with parked ops waiting, syncing while they replay with rebase, syncing during replay. The brand mark tints with state."
+    },
+    {
+      "id": "note-auth",
+      "x": 1300,
+      "y": 1930,
+      "w": 420,
+      "page": "page-1",
+      "text": "Auth is additive: A creates the guest session on first visit; B/C upgrade it in place (same colour, queue kept); D is the account menu backed by viewer.boards."
+    },
+    {
+      "id": "note-components",
+      "x": 0,
+      "y": 2710,
+      "w": 420,
+      "page": "page-1",
+      "text": "Component sheet: both token sets, buttons, sync pills, every card-row state the sync engine can produce, toasts raised by the MobX store, inputs, log rows. Every artboard on this page has a 'Theme' tweak; the board, card panel and phone also flip from their header switch."
+    },
+    {
+      "id": "note-a",
+      "x": 0,
+      "y": -110,
+      "w": 380,
+      "page": "page-2",
+      "text": "Option A — Paper & ink. Kept for reference; not chosen."
+    },
+    {
+      "id": "note-c",
+      "x": 1300,
+      "y": -110,
+      "w": 380,
+      "page": "page-2",
+      "text": "Option C — Sticky notes. Kept for reference; not chosen."
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-1"
+  }
+}

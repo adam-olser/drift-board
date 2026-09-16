@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif; }
+    a { color: #1a1a1a; } a:hover { color: #d8452f; }
+    .card { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; background: #ffffff; border: 2px solid #1a1a1a; border-radius: 6px; box-shadow: 4px 4px 0 #1a1a1a; }
+    .card .t { font-size: 16px; font-weight: 500; line-height: 1.25; color: #1a1a1a; }
+    .card .m { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #55524c; }
+    .tag { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; padding: 2px 8px; border: 2px solid #1a1a1a; border-radius: 999px; background: #fff; }
+    .colh { display: flex; align-items: center; justify-content: space-between; font-size: 20px; font-weight: 700; color: #1a1a1a; }
+    .colh .c { width: 30px; height: 30px; border: 2px solid #1a1a1a; border-radius: 50%; background: #fff; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+    .av { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #1a1a1a; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; color: #1a1a1a; }
+  </style>
+</helmet>
+<div style="width: 1200px; height: 760px; box-sizing: border-box; background: #fbf6e8; color: #1a1a1a; display: flex; flex-direction: column; overflow: hidden;">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 22px 32px 16px 32px;">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <div style="font-size: 30px; font-weight: 700; letter-spacing: -0.03em; transform: rotate(-2deg); display: inline-block;">Driftboard</div>
+      <div style="font-size: 15px; font-weight: 500; padding: 8px 14px; border: 2px solid #1a1a1a; border-radius: 999px; background: #fff;">Client site redesign</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <div style="display: flex; align-items: center;">
+        <div class="av" style="background: #ffe66d;">MK</div>
+        <div class="av" style="background: #9ad0ff; margin-left: -10px;">JO</div>
+        <div class="av" style="background: #ffb3c7; margin-left: -10px;">A</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; padding: 7px 12px; background: #b8f0b0; border: 2px solid #1a1a1a; border-radius: 999px;">
+        <span style="width: 9px; height: 9px; border-radius: 50%; background: #1a1a1a;"></span>Live
+      </div>
+      <div style="font-size: 13px; color: #55524c;">You're <strong>Ada</strong> (guest)</div>
+      <div style="font-size: 13px; font-weight: 700; padding: 8px 14px; background: #1a1a1a; color: #fbf6e8; border-radius: 6px;">Sign in</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding: 6px 32px 0 32px; flex-grow: 1;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px; padding: 18px; background: #ffe66d; border: 2px solid #1a1a1a; border-radius: 10px;">
+      <div class="colh"><span>To do</span><span class="c">4</span></div>
+      <div class="card"><div class="t">Rewrite hero copy for the launch page</div><div class="m"><span>Mira · 2m</span><span class="tag">copy</span></div></div>
+      <div class="card" style="transform: rotate(-1deg);"><div class="t">Collect logo files from the client</div><div class="m"><span>Ada · 1d</span><span class="tag">asset</span></div></div>
+      <div class="card"><div class="t">Decide on the pricing table layout</div><div class="m"><span>Jon · 1d</span><span class="tag">design</span></div></div>
+      <div class="card" style="transform: rotate(1deg);"><div class="t">Set up staging domain</div><div class="m"><span>Ada · 3d</span><span class="tag">infra</span></div></div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px; padding: 18px; background: #9ad0ff; border: 2px solid #1a1a1a; border-radius: 10px;">
+      <div class="colh"><span>In progress</span><span class="c">2</span></div>
+      <div class="card" style="box-shadow: 4px 4px 0 #d8452f; border-color: #d8452f;"><div class="t">Build responsive nav</div><div class="m"><span style="color: #d8452f; font-weight: 700;">Mira is typing…</span><span class="tag">front</span></div></div>
+      <div class="card" style="transform: rotate(1.5deg);"><div class="t">Photograph the workshop</div><div class="m"><span>Jon · 1h</span><span class="tag">asset</span></div></div>
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 2px dashed #1a1a1a; border-radius: 6px; font-size: 13px; color: #1a1a1a; opacity: 0.6;">Drop a card here</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px; padding: 18px; background: #b8f0b0; border: 2px solid #1a1a1a; border-radius: 10px;">
+      <div class="colh"><span>Done</span><span class="c">3</span></div>
+      <div class="card" style="box-shadow: none; opacity: 0.75;"><div class="t" style="text-decoration: line-through;">Agree on scope and timeline</div><div class="m"><span>Ada · last week</span></div></div>
+      <div class="card" style="box-shadow: none; opacity: 0.75; transform: rotate(-1deg);"><div class="t" style="text-decoration: line-through;">Choose type pairing</div><div class="m"><span>Mira · last week</span></div></div>
+      <div class="card" style="box-shadow: none; opacity: 0.75;"><div class="t" style="text-decoration: line-through;">Send first invoice</div><div class="m"><span>Jon · last week</span></div></div>
+    </div>
+
+  </div>
+
+  <div style="display: flex; justify-content: flex-start; padding: 14px 32px 22px 32px;">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: #fff; border: 2px solid #1a1a1a; border-radius: 6px; box-shadow: 4px 4px 0 #1a1a1a; font-size: 13px; font-weight: 500;">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1a1a1a" stroke-width="2"><path d="M2 8h9M8 4l4 4-4 4"></path></svg>Mira moved “Build responsive nav” to In progress
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>
