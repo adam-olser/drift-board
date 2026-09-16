@@ -273,9 +273,9 @@ Each task is one commit (or two). "Done when" is the verification, executed, not
 
 ### Milestone 5 — Optimistic UI (~3 h)
 
-- [ ] **T5.1 `lagLink.ts`** — reads `?lag=` once at startup, delays every operation by that many ms; absent → link is not added.
-- [ ] **T5.2 `optimisticResponse`** on `moveCard` (the card with its new `columnId`/`position`), `updateCard`, `createCard` (real client-generated id, key `···` until the result lands); `createCard`'s `update` calls `cardList.append` (Apollo runs `update` for the optimistic layer too, so the new card appears instantly); `deleteCard`'s `update` calls `cardList.remove`; results replace layers.
-- [ ] **T5.3 Error mapping** — `onError` link → `SyncStore.toast()` for `CARD_GONE`, `VERSION_MISMATCH` (message includes the current title). `Toasts.tsx` per Components artboard.
+- [x] **T5.1 `lagLink.ts`** — reads `?lag=` once at startup, delays every operation by that many ms; absent → link is not added.
+- [x] **T5.2 `optimisticResponse`** on `moveCard` (the card with its new `columnId`/`position`), `updateCard`, `createCard` (real client-generated id, key `···` until the result lands); `createCard`'s `update` calls `cardList.append` (Apollo runs `update` for the optimistic layer too, so the new card appears instantly); `deleteCard`'s `update` calls `cardList.remove`; results replace layers.
+- [x] **T5.3 Error mapping** — `onError` link → `SyncStore.toast()` for `CARD_GONE`, `VERSION_MISMATCH` (message includes the current title). `Toasts.tsx` per Components artboard.
   *Done when* Milestone 5's Verify line passes with `?lag=2000` on the live URL.
 
 ### Milestone 6 — Conflicts + offline (~7 h)

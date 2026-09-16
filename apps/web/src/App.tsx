@@ -8,6 +8,7 @@ import { Home } from './features/boards/Home';
 import { NameDialog } from './features/session/NameDialog';
 import { useViewer } from './features/session/useViewer';
 import { Avatars } from './features/sync/Avatars';
+import { Toasts } from './features/sync/Toasts';
 import { useRoute } from './router';
 import styles from './App.module.css';
 
@@ -51,6 +52,7 @@ export function App() {
     <ApolloProvider client={client}>
       <div className={styles.shell}>
         <Screen />
+        <Toasts />
       </div>
     </ApolloProvider>
   );

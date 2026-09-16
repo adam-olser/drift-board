@@ -18,9 +18,11 @@ export interface PendingOp {
   observer: Observer<unknown>;
 }
 
+export type ToastKind = 'ok' | 'queued' | 'error';
 export interface Toast {
   id: number;
   message: string;
+  kind: ToastKind;
 }
 
 /**
@@ -61,8 +63,8 @@ export class SyncStore {
     if (this.log.length > 200) this.log.shift(); // ponytail: ring buffer by shift, fine at 200
   }
 
-  toast(message: string) {
-    this.toasts.push({ id: this.nextToast++, message });
+  toast(message: string, kind: ToastKind = 'error') {
+    this.toasts.push({ id: this.nextToast++, message, kind });
   }
 
   dismissToast(id: number) {
