@@ -8,10 +8,17 @@ const keyOf = (data: Record<string, unknown> | null | undefined): string | undef
   return card && typeof card === 'object' && 'key' in card ? String(card.key) : undefined;
 };
 
-/** Every operation lands in the sync log: pending at request time, settled with timing. */
+/**
+ * Card mutations (the ones carrying an opId) land in the sync log: pending at request time,
+ * settled with timing. Everything else (queries, subscriptions, session mutations) passes
+ * through untouched — SyncLog and CardPanel only ever display card ops, and logging every
+ * query would touch the MobX-observed log on every render, including ones that fire from a
+ * route change while a log-reading component is unmounting.
+ */
 export const logLink = new ApolloLink((operation, forward) => {
-  const ts = Date.now();
   const vars = operation.variables;
+  if (!vars['opId']) return forward(operation);
+  const ts = Date.now();
   const cardId = (vars['cardId'] ?? vars['id'] ?? null) as string | null;
   // The key from the cache at request time survives a delete's eviction.
   const cache = operation.getContext()['cache'] as ApolloCache<unknown> | undefined;
