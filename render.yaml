@@ -1,0 +1,24 @@
+# Render blueprint: one always-on web service serving the API and the web bundle.
+# The database is Neon (D-008); paste its connection string as DATABASE_URL in the dashboard.
+services:
+  - type: web
+    name: driftboard
+    runtime: node
+    plan: starter
+    region: frankfurt
+    branch: main
+    autoDeploy: true
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
+    startCommand: node apps/server/dist/index.js
+    healthCheckPath: /graphiql
+    envVars:
+      - key: NODE_VERSION
+        value: 22.15.0
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: COOKIE_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false

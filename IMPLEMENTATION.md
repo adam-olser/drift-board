@@ -257,7 +257,7 @@ Each task is one commit (or two). "Done when" is the verification, executed, not
 
 ### Milestone 3 — Deploy (~2 h)
 
-- [ ] **T3.1 Single origin** — server serves `apps/web/dist` via `@fastify/static` with SPA fallback; `pnpm build` builds shared → web → server (esbuild bundle to `apps/server/dist/index.js`).
+- [x] **T3.1 Single origin** — server serves `apps/web/dist` via `@fastify/static` with SPA fallback; `pnpm build` builds shared → web → server (esbuild bundle to `apps/server/dist/index.js`).
   *Done when* `pnpm build && node apps/server/dist/index.js` serves the app on one port with no proxy.
 - [ ] **T3.2 Render + Neon** — create the Neon project, run `schema.sql` + `seed.sql` against it once with `psql` (or the Neon SQL editor). `render.yaml`: one web service (build `pnpm i --frozen-lockfile && pnpm build`, start `node apps/server/dist/index.js`, starter plan), env vars `DATABASE_URL` (Neon, with `sslmode=require`) and `COOKIE_SECRET` (generated), `NODE_ENV=production`, auto-deploy on `main`.
   *Done when* the live URL passes Milestone 3's Verify line and a fresh clone runs locally in under 5 minutes by the clock.
