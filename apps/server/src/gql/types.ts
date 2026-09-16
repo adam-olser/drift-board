@@ -1,4 +1,6 @@
 import type { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
+import type { BoardParent } from '../modules/boards/sql';
+import type { SessionParent, ViewerParent } from '../modules/sessions/sql';
 import type { Context } from '../graphql';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -293,7 +295,7 @@ export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = {
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-  Board: ResolverTypeWrapper<Board>;
+  Board: ResolverTypeWrapper<BoardParent>;
   BoardEvent: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['BoardEvent']>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Card: ResolverTypeWrapper<Card>;
@@ -311,16 +313,16 @@ export type ResolversTypes = {
   Presence: ResolverTypeWrapper<Presence>;
   PresenceChanged: ResolverTypeWrapper<PresenceChanged>;
   Query: ResolverTypeWrapper<{}>;
-  Session: ResolverTypeWrapper<Session>;
+  Session: ResolverTypeWrapper<SessionParent>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Subscription: ResolverTypeWrapper<{}>;
   User: ResolverTypeWrapper<User>;
-  Viewer: ResolverTypeWrapper<Viewer>;
+  Viewer: ResolverTypeWrapper<ViewerParent>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-  Board: Board;
+  Board: BoardParent;
   BoardEvent: ResolversUnionTypes<ResolversParentTypes>['BoardEvent'];
   Boolean: Scalars['Boolean']['output'];
   Card: Card;
@@ -338,11 +340,11 @@ export type ResolversParentTypes = {
   Presence: Presence;
   PresenceChanged: PresenceChanged;
   Query: {};
-  Session: Session;
+  Session: SessionParent;
   String: Scalars['String']['output'];
   Subscription: {};
   User: User;
-  Viewer: Viewer;
+  Viewer: ViewerParent;
 };
 
 export type BoardResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Board'] = ResolversParentTypes['Board']> = {

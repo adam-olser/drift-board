@@ -11,8 +11,14 @@ export interface SessionRow {
 
 const COLUMNS = 'id, display_name, color, user_id, created_at';
 
-/** Row → GraphQL Session. `user` is resolved by its own field resolver (Milestone 8). */
-export function toSession(row: SessionRow): Omit<Session, 'user'> {
+/** What resolvers return for Session; `user` has its own field resolver (Milestone 8). */
+export type SessionParent = Omit<Session, 'user'>;
+/** What Query.viewer returns; `boards` is resolved by the boards module. */
+export interface ViewerParent {
+  session: SessionParent | null;
+}
+
+export function toSession(row: SessionRow): SessionParent {
   return { id: row.id, displayName: row.display_name, color: row.color };
 }
 

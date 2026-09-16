@@ -11,3 +11,5 @@ export function assertLength(field: string, value: string, max: number): string 
   if (trimmed.length > max) throw badInput(`${field} is longer than ${max} characters.`);
   return trimmed;
 }
+
+export const BOARD_NAME_MAX = 80;

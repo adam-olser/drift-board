@@ -9,7 +9,6 @@ export const sessionResolvers = {
   Query: {
     viewer: (_parent, _args, ctx) => ({
       session: ctx.session ? toSession(ctx.session) : null,
-      boards: [], // Viewer.boards is resolved by the boards module (T2.4)
     }),
   },
   Mutation: {

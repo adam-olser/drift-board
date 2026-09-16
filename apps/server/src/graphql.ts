@@ -9,6 +9,7 @@ import { pool } from './db';
 import { readSessionId } from './modules/sessions/cookie';
 import { findSession, type SessionRow } from './modules/sessions/sql';
 import { sessionResolvers } from './modules/sessions/resolvers';
+import { boardResolvers } from './modules/boards/resolvers';
 
 /** Per-request context handed to every resolver. `session` is null until startGuestSession. */
 export interface Context {
@@ -48,13 +49,10 @@ function touchesSessionOp(document: DocumentNode): boolean {
 }
 
 const resolvers = {
-  Query: {
-    board: () => null,
-    ...sessionResolvers.Query,
-  },
-  Mutation: {
-    ...sessionResolvers.Mutation,
-  },
+  Query: { ...sessionResolvers.Query, ...boardResolvers.Query },
+  Mutation: { ...sessionResolvers.Mutation, ...boardResolvers.Mutation },
+  Viewer: boardResolvers.Viewer,
+  Board: boardResolvers.Board,
 } satisfies Resolvers;
 
 export async function registerGraphql(app: FastifyInstance): Promise<void> {
