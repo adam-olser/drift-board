@@ -29,11 +29,16 @@ export const wsClient = createClient({
   // why: the default backoff starts at 1–4 s; the name dialog terminates the socket to re-auth
   // and should not wait that long. 250 ms, doubling, capped at 8 s.
   retryWait: retries => new Promise(r => setTimeout(r, Math.min(250 * 2 ** retries, 8000))),
+  // Ping every 10 s so a silently dead socket (wifi off, laptop lid) is noticed within ~15 s.
+  keepAlive: 10_000,
   on: {
     connected: () => syncStore.replay(),
     closed: () => syncStore.setConnection('offline'),
   },
 });
+
+// The browser knows first when the network goes; drop the socket so the queue starts parking.
+window.addEventListener('offline', () => wsClient.terminate());
 
 export const transportLink = split(
   ({ query }) => touchesSessionOp(query),

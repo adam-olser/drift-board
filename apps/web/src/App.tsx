@@ -1,5 +1,5 @@
 import { ApolloProvider } from '@apollo/client';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { createApolloClient } from './apollo/client';
 import { Board } from './features/board/Board';
 import { useBoard } from './features/board/useBoard';
@@ -8,12 +8,13 @@ import { Home } from './features/boards/Home';
 import { NameDialog } from './features/session/NameDialog';
 import { useViewer } from './features/session/useViewer';
 import { Avatars } from './features/sync/Avatars';
+import { syncStore } from './features/sync/SyncStore';
 import { Toasts } from './features/sync/Toasts';
 import { useRoute } from './router';
 import styles from './App.module.css';
 
 function BoardScreen({ slug }: { slug: string }) {
-  const { board, loading, error, move, create, rename } = useBoard(slug);
+  const { board, loading, error, move, create, rename, remove } = useBoard(slug);
   useBoardEvents(board?.id);
   if (loading) return <p className={styles.status}>Loading…</p>;
   if (error) return <p className={styles.status}>Could not load the board: {error.message}</p>;
@@ -21,7 +22,13 @@ function BoardScreen({ slug }: { slug: string }) {
   return (
     <>
       <Avatars />
-      <Board board={board} onMove={move} onCreate={create} onRename={rename} />
+      <Board
+        board={board}
+        onMove={move}
+        onCreate={create}
+        onRename={rename}
+        onDelete={card => remove(card.id)}
+      />
     </>
   );
 }
@@ -48,6 +55,9 @@ function Screen() {
 
 export function App() {
   const client = useMemo(() => createApolloClient(), []);
+  // why: attach here, not inside createApolloClient — StrictMode runs the memo factory twice
+  // in dev and keeps only one client; the store must hold that one.
+  useEffect(() => syncStore.attach(client), [client]);
   return (
     <ApolloProvider client={client}>
       <div className={styles.shell}>

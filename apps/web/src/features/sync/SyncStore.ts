@@ -1,6 +1,7 @@
-import type { ApolloClient, Observer, Operation } from '@apollo/client';
-import { makeAutoObservable, observableShallow } from 'mobx';
-import type { PresenceFieldsFragment } from '@/gql/graphql';
+import type { ApolloClient, NextLink, Observer, Operation } from '@apollo/client';
+import { makeAutoObservable, observableShallow, runInAction } from 'mobx';
+import { BoardDocument, type PresenceFieldsFragment } from '@/gql/graphql';
+import { rebase, type Replayable } from './replay';
 
 export type Connection = 'online' | 'offline' | 'syncing';
 
@@ -13,8 +14,9 @@ export interface LogEntry {
 }
 
 /** An operation parked while offline; forwarded by replay() (T6.3). */
-export interface PendingOp {
+export interface PendingOp extends Replayable {
   operation: Operation;
+  forward: NextLink;
   observer: Observer<unknown>;
 }
 
@@ -71,10 +73,69 @@ export class SyncStore {
     this.toasts = this.toasts.filter(t => t.id !== id);
   }
 
-  /** T6.3 replaces this: forward the queue in order with rebase, then refetch the board. */
-  replay() {
-    this.setConnection('online');
+  park(entry: PendingOp) {
+    this.queue.push(entry);
+  }
+
+  /** Cards with a parked op, for the dashed row style (T6.4). */
+  isQueued(cardId: string): boolean {
+    return this.queue.some(e => e.cardId === cardId);
+  }
+
+  /**
+   * On reconnect: forward the parked ops one at a time, rebasing baseVersion from each result,
+   * then refetch the board. A rejected op has already errored its observer (layer dropped,
+   * toast shown). If the socket closes mid-way, stop and leave the rest parked.
+   */
+  async replay() {
+    if (this.queue.length === 0) {
+      this.setConnection('online');
+      return;
+    }
+    const total = this.queue.length;
+    this.setConnection('syncing');
+    this.replayProgress = { done: 0, total };
+    while (this.queue.length > 0 && this.connection === 'syncing') {
+      const entry = this.queue[0] as PendingOp;
+      if (entry.baseVersion != null) entry.operation.variables['baseVersion'] = entry.baseVersion;
+      const result = await new Promise<Record<string, unknown> | null>(resolve => {
+        let data: Record<string, unknown> | null = null;
+        entry.forward(entry.operation).subscribe({
+          next: r => {
+            data = (r.data as Record<string, unknown> | null) ?? null;
+            entry.observer.next?.(r);
+          },
+          error: e => {
+            entry.observer.error?.(e);
+            resolve(null);
+          },
+          complete: () => {
+            entry.observer.complete?.();
+            resolve(data);
+          },
+        });
+      });
+      runInAction(() => {
+        this.queue = this.queue.slice(1);
+        const updated = result?.['updateCard'] as { id: string; version: number } | undefined;
+        if (updated)
+          this.queue = rebase(this.queue, { cardId: updated.id, version: updated.version });
+        if (this.replayProgress) this.replayProgress.done += 1;
+      });
+    }
+    if (this.connection !== 'syncing') return; // went offline mid-replay
+    await this.client?.refetchQueries({ include: [BoardDocument] });
+    runInAction(() => {
+      this.replayProgress = null;
+      this.connection = 'online';
+      this.toast(
+        `Back online — ${total} queued ${total === 1 ? 'change' : 'changes'} synced`,
+        'ok'
+      );
+    });
   }
 }
 
 export const syncStore = new SyncStore();
+// Exposed for the interview demo and the browser verify scripts (D-018); not used by app code.
+Object.assign(window, { syncStore });
