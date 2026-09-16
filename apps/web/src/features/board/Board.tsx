@@ -27,6 +27,7 @@ interface Props {
   onMove: (cardId: string, plan: MovePlan) => void;
   onCreate: (columnId: string, title: string) => void;
   onRename: (card: CardFieldsFragment, title: string) => void;
+  onDelete: (card: CardFieldsFragment) => void;
 }
 
 /** Group the flat card list by column, sorted by position. */
@@ -58,7 +59,7 @@ function toDropTarget(overId: string): DropTarget {
     : { kind: 'card', id: overId };
 }
 
-export function Board({ board, onMove, onCreate, onRename }: Props) {
+export function Board({ board, onMove, onCreate, onRename, onDelete }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -94,6 +95,7 @@ export function Board({ board, onMove, onCreate, onRename }: Props) {
             done={column === last}
             onCreate={title => onCreate(column.id, title)}
             onRename={onRename}
+            onDelete={onDelete}
           />
         ))}
       </main>

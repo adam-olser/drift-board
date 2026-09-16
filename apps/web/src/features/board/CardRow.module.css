@@ -74,3 +74,14 @@
 .row[data-editing] {
   cursor: default;
 }
+
+.queued {
+  border-style: dashed;
+  border-color: var(--queued);
+}
+
+.status {
+  font-size: 11px;
+  color: var(--queued);
+  flex-shrink: 0;
+}

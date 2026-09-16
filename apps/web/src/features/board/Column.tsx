@@ -13,9 +13,10 @@ interface Props {
   done?: boolean;
   onCreate: (title: string) => void;
   onRename: (card: CardFieldsFragment, title: string) => void;
+  onDelete: (card: CardFieldsFragment) => void;
 }
 
-export function Column({ column, cards, done = false, onCreate, onRename }: Props) {
+export function Column({ column, cards, done = false, onCreate, onRename, onDelete }: Props) {
   const { setNodeRef } = useDroppable({ id: columnDropId(column.id) });
   const [adding, setAdding] = useState(false);
   const [title, setTitle] = useState('');
@@ -36,7 +37,13 @@ export function Column({ column, cards, done = false, onCreate, onRename }: Prop
       </header>
       <SortableContext items={cards.map(c => c.id)} strategy={verticalListSortingStrategy}>
         {cards.map(card => (
-          <CardRow key={card.id} card={card} done={done} onRename={t => onRename(card, t)} />
+          <CardRow
+            key={card.id}
+            card={card}
+            done={done}
+            onRename={t => onRename(card, t)}
+            onDelete={() => onDelete(card)}
+          />
         ))}
       </SortableContext>
       {adding ? (

@@ -1,6 +1,8 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { observer } from 'mobx-react-lite';
 import { useState, type KeyboardEvent } from 'react';
+import { syncStore } from '@/features/sync/SyncStore';
 import type { CardFieldsFragment } from '@/gql/graphql';
 import styles from './CardRow.module.css';
 
@@ -12,11 +14,33 @@ interface ViewProps {
   onRename?: ((title: string) => void) | undefined;
 }
 
+// why: a card moved by a peer remounts in its new column; the draft survives the remount.
+const drafts = new Map<string, string>();
+
 /** Presentational row: used in the column and, as a copy, inside the DragOverlay. */
-export function CardRowView({ card, done = false, overlay = false, onRename }: ViewProps) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(card.title);
-  const classes = [styles.row, done && styles.done, overlay && styles.overlay]
+export const CardRowView = observer(function CardRowView({
+  card,
+  done = false,
+  overlay = false,
+  onRename,
+}: ViewProps) {
+  const [editing, setEditing] = useState(!overlay && drafts.has(card.id));
+  const [draft, setDraftState] = useState(drafts.get(card.id) ?? card.title);
+  const setDraft = (value: string) => {
+    drafts.set(card.id, value);
+    setDraftState(value);
+  };
+  const stopEditing = () => {
+    drafts.delete(card.id);
+    setEditing(false);
+  };
+  const queued = syncStore.isQueued(card.id);
+  const classes = [
+    styles.row,
+    done && styles.done,
+    overlay && styles.overlay,
+    queued && styles.queued,
+  ]
     .filter(Boolean)
     .join(' ');
 
@@ -26,7 +50,7 @@ export function CardRowView({ card, done = false, overlay = false, onRename }: V
     setEditing(true);
   };
   const commit = () => {
-    setEditing(false);
+    stopEditing();
     const title = draft.trim();
     if (title && title !== card.title) onRename?.(title);
   };
@@ -35,7 +59,7 @@ export function CardRowView({ card, done = false, overlay = false, onRename }: V
     // that never ends and blocks every later pointer drag.
     e.stopPropagation();
     if (e.key === 'Enter') commit();
-    if (e.key === 'Escape') setEditing(false);
+    if (e.key === 'Escape') stopEditing();
   };
 
   return (
@@ -62,6 +86,7 @@ export function CardRowView({ card, done = false, overlay = false, onRename }: V
           {card.title}
         </span>
       )}
+      {queued ? <span className={styles.status}>queued</span> : null}
       <span
         className={styles.chip}
         style={{ background: card.updatedBy.color }}
@@ -71,16 +96,20 @@ export function CardRowView({ card, done = false, overlay = false, onRename }: V
       </span>
     </div>
   );
-}
+});
 
 interface Props {
   card: CardFieldsFragment;
   done?: boolean;
   onRename: (title: string) => void;
+  onDelete: () => void;
 }
 
-/** Sortable row in a column. While dragging, the source dims and the overlay carries the card. */
-export function CardRow({ card, done = false, onRename }: Props) {
+/**
+ * Sortable row in a column. While dragging, the source dims and the overlay carries the card.
+ * Delete/Backspace on the focused row deletes it; the detail panel (M7) adds a button.
+ */
+export function CardRow({ card, done = false, onRename, onDelete }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: card.id,
   });
@@ -91,6 +120,10 @@ export function CardRow({ card, done = false, onRename }: Props) {
       style={{ transform: CSS.Transform.toString(transform), transition }}
       {...attributes}
       {...listeners}
+      onKeyDown={e => {
+        if (e.key === 'Delete' || e.key === 'Backspace') onDelete();
+        else listeners?.['onKeyDown']?.(e);
+      }}
     >
       <CardRowView card={card} done={done} onRename={onRename} />
     </div>
