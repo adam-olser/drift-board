@@ -5,12 +5,22 @@ import { Kind, type DocumentNode } from 'graphql';
 import type { Resolvers } from './gql/types';
 import { rateLimited } from './errors';
 import { env } from './env';
+import { pool } from './db';
+import { readSessionId } from './modules/sessions/cookie';
+import { findSession, type SessionRow } from './modules/sessions/sql';
+import { sessionResolvers } from './modules/sessions/resolvers';
 
-/** Per-request context handed to every resolver. `session` arrives in T2.3. */
+/** Per-request context handed to every resolver. `session` is null until startGuestSession. */
 export interface Context {
   request: FastifyRequest;
   reply: FastifyReply;
-  session: null;
+  session: SessionRow | null;
+}
+
+async function buildContext(request: FastifyRequest, reply: FastifyReply): Promise<Context> {
+  const sessionId = readSessionId(request);
+  const session = sessionId ? await findSession(pool, sessionId) : null;
+  return { request, reply, session };
 }
 
 declare module 'mercurius' {
@@ -40,7 +50,10 @@ function touchesSessionOp(document: DocumentNode): boolean {
 const resolvers = {
   Query: {
     board: () => null,
-    viewer: () => ({ session: null, boards: [] }),
+    ...sessionResolvers.Query,
+  },
+  Mutation: {
+    ...sessionResolvers.Mutation,
   },
 } satisfies Resolvers;
 
@@ -51,7 +64,7 @@ export async function registerGraphql(app: FastifyInstance): Promise<void> {
     // assignable; `satisfies Resolvers` above did the real checking.
     resolvers: resolvers as IResolvers,
     graphiql: !env.isProduction,
-    context: (request, reply): Context => ({ request, reply, session: null }),
+    context: buildContext,
   });
 
   const checkSessionOpLimit = app.createRateLimit({ max: 20, timeWindow: '1 minute' });
