@@ -42,10 +42,19 @@ export function SignInDialog({
   };
 
   return (
-    <dialog ref={ref} className={styles.dialog} onClose={onClose}>
+    <dialog
+      ref={ref}
+      className={styles.dialog}
+      onClose={onClose}
+      onClick={e => e.target === e.currentTarget && onClose()}
+    >
       <form className={styles.form} onSubmit={submit} method="dialog">
         <h1 className={styles.title}>{mode === 'in' ? 'Sign in' : 'Create an account'}</h1>
         <p className={styles.sub}>Keeps your colour and anything queued. Adds “My boards”.</p>
+        <p className={styles.note}>
+          Demo accounts: passwords are stored as scrypt hashes, but there is no password reset and
+          no email verification. Use a throwaway password you can afford to forget.
+        </p>
         {mode === 'up' ? (
           <label className={styles.label}>
             Name

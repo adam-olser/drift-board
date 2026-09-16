@@ -20,6 +20,8 @@ import {
 } from './sql';
 
 const NO_MATCH = "Email or password didn't match.";
+// why: an unknown email must cost the same as a wrong password, or timing reveals which.
+const DUMMY_HASH = `${'0'.repeat(32)}:${'0'.repeat(128)}`;
 
 async function newGuest(ctx: Context, displayName: string): Promise<SessionRow> {
   const row = await insertSession(pool, displayName, colorFor(await countSessions(pool)));
@@ -69,7 +71,8 @@ export const sessionResolvers = {
     },
     logIn: async (_parent, { email, password }, ctx) => {
       const user = await findUserByEmail(pool, email.trim());
-      if (!user || !(await verifyPassword(password, user.password_hash))) throw badInput(NO_MATCH);
+      const ok = await verifyPassword(password, user?.password_hash ?? DUMMY_HASH);
+      if (!user || !ok) throw badInput(NO_MATCH);
       return attach(ctx, user);
     },
     logOut: async (_parent, _args, ctx) => {
