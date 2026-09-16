@@ -240,7 +240,7 @@ Each task is one commit (or two). "Done when" is the verification, executed, not
 
 ### Milestone 2 — API + Postgres + guest sessions (~8 h)
 
-- [ ] **T2.1 Postgres** — `docker-compose.yml` with `db/init/01-databases.sql` mounted into `/docker-entrypoint-initdb.d` (creates `driftboard_test` next to the default db), `schema.sql` (above), `seed.sql` (one board `7f3k2` "Client site redesign", key prefix `DB`, three columns, the nine cards from the Main artboard authored by three seed sessions named MK, JO and Ada so the chips match the design). `db.ts` with `Pool` and `withTx`.
+- [x] **T2.1 Postgres** — `docker-compose.yml` with `db/init/01-databases.sql` mounted into `/docker-entrypoint-initdb.d` (creates `driftboard_test` next to the default db), `schema.sql` (above), `seed.sql` (one board `7f3k2` "Client site redesign", key prefix `DB`, three columns, the nine cards from the Main artboard authored by three seed sessions named MK, JO and Ada so the chips match the design). `db.ts` with `Pool` and `withTx`.
   *Done when* `pnpm db:up && pnpm db:reset` succeeds twice in a row.
 - [ ] **T2.2 Fastify + Mercurius** — `index.ts`, `env.ts`, `graphql.ts` registering `schema.graphql` with empty resolvers typed from `src/gql/` (server codegen config), `@fastify/cookie` with the D-011 attributes, `@fastify/rate-limit` scoped to the session mutations. GraphiQL on in dev.
   *Done when* `{ viewer { session { id } } }` returns `null` session from GraphiQL at `localhost:4000/graphiql`.
@@ -318,6 +318,8 @@ COOKIE_SECRET=change-me-32-chars-minimum-please
 PORT=4000
 NODE_ENV=development
 ```
+Local Docker on this machine is Rancher Desktop: make sure `~/.rd/bin` is on `PATH` (credential helper) and the CLI context is `rancher-desktop` (`docker context use rancher-desktop`), otherwise `docker compose` talks to a stale colima socket.
+
 On Render, `DATABASE_URL` is the Neon connection string (or the linked paid Render Postgres) and `COOKIE_SECRET` a generated secret; nothing else is needed.
 
 ## 7. Definition of done for the whole project

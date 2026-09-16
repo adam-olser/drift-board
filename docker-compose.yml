@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: driftboard-postgres
+    environment:
+      POSTGRES_USER: driftboard
+      POSTGRES_PASSWORD: driftboard
+      POSTGRES_DB: driftboard
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./apps/server/db:/db:ro
+      - ./apps/server/db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U driftboard -d driftboard']
+      interval: 2s
+      timeout: 2s
+      retries: 20
+
+volumes:
+  pgdata:
