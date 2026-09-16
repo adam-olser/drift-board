@@ -14,9 +14,18 @@ interface Props {
   onCreate: (title: string) => void;
   onRename: (card: CardFieldsFragment, title: string) => void;
   onDelete: (card: CardFieldsFragment) => void;
+  onOpen: (card: CardFieldsFragment) => void;
 }
 
-export function Column({ column, cards, done = false, onCreate, onRename, onDelete }: Props) {
+export function Column({
+  column,
+  cards,
+  done = false,
+  onCreate,
+  onRename,
+  onDelete,
+  onOpen,
+}: Props) {
   const { setNodeRef } = useDroppable({ id: columnDropId(column.id) });
   const [adding, setAdding] = useState(false);
   const [title, setTitle] = useState('');
@@ -43,6 +52,7 @@ export function Column({ column, cards, done = false, onCreate, onRename, onDele
             done={done}
             onRename={t => onRename(card, t)}
             onDelete={() => onDelete(card)}
+            onOpen={() => onOpen(card)}
           />
         ))}
       </SortableContext>

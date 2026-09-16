@@ -46,27 +46,33 @@ export function useBoard(slug: string) {
     );
   };
 
-  const rename = (card: CardFieldsFragment, title: string) =>
+  const edit = (card: CardFieldsFragment, fields: { title?: string; description?: string }) =>
     settled(
       updateCard({
-        variables: { opId: opId(), cardId: card.id, baseVersion: card.version, title },
+        variables: { opId: opId(), cardId: card.id, baseVersion: card.version, ...fields },
         optimisticResponse: {
-          updateCard: { ...card, title, version: card.version + 1, ...stamp() },
+          updateCard: { ...card, ...fields, version: card.version + 1, ...stamp() },
         },
       })
     );
+  const rename = (card: CardFieldsFragment, title: string) => edit(card, { title });
 
-  const create = (columnId: string, title: string) => {
-    if (!board) return Promise.resolve(undefined);
-    const last = board.cards
+  /** Position after the last card in a column. */
+  const tailPosition = (columnId: string) => {
+    const last = (board?.cards ?? [])
       .filter(c => c.columnId === columnId)
       .reduce<number | null>(
         (max, c) => (max === null || c.position > max ? c.position : max),
         null
       );
+    return between(last, null);
+  };
+
+  const create = (columnId: string, title: string) => {
+    if (!board) return Promise.resolve(undefined);
     const boardId = board.id;
     const id = crypto.randomUUID();
-    const position = between(last, null);
+    const position = tailPosition(columnId);
     return settled(
       createCard({
         variables: { opId: opId(), id, boardId, columnId, title, position },
@@ -104,5 +110,5 @@ export function useBoard(slug: string) {
     );
   };
 
-  return { board, loading, error, move, rename, create, remove };
+  return { board, loading, error, move, rename, edit, create, remove, tailPosition };
 }
