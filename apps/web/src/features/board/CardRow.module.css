@@ -50,6 +50,9 @@
 }
 
 .dragging {
-  opacity: 0.4;
+  position: relative;
+  z-index: 10; /* paint above the neighbouring column's rows while translated across */
   cursor: grabbing;
+  border-color: var(--border-strong);
+  box-shadow: 0 8px 24px var(--shadow);
 }

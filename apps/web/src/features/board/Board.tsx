@@ -4,8 +4,10 @@ import {
   KeyboardSensor,
   PointerSensor,
   closestCorners,
+  pointerWithin,
   useSensor,
   useSensors,
+  type CollisionDetection,
   type DragEndEvent,
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
@@ -29,6 +31,15 @@ export function cardsByColumn(cards: readonly SeedCard[]): Map<string, SeedCard[
   for (const list of groups.values()) list.sort((a, b) => a.position - b.position);
   return groups;
 }
+
+/**
+ * Whatever the pointer is inside wins (a card, else its column — so an empty column is a valid
+ * target); closestCorners only as a fallback for keyboard dragging, where there is no pointer.
+ */
+const collisionDetection: CollisionDetection = args => {
+  const within = pointerWithin(args);
+  return within.length > 0 ? within : closestCorners(args);
+};
 
 function toDropTarget(overId: string): DropTarget {
   return overId.startsWith('column:')
@@ -55,7 +66,7 @@ export function Board({ board }: Props) {
   const columns = [...board.columns].sort((a, b) => a.position - b.position);
   const last = columns.at(-1);
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={onDragEnd}>
+    <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragEnd={onDragEnd}>
       <main className={styles.board}>
         {columns.map(column => (
           <Column
