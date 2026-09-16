@@ -1,17 +1,26 @@
 .panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: min(520px, 100vw);
+  width: 520px;
+  flex-shrink: 0;
+  min-height: 0;
   background: var(--bg);
   color: var(--text);
   border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  z-index: 5;
-  box-shadow: 0 0 40px var(--shadow);
   animation: slide 160ms ease-out;
+}
+.panel[data-full] {
+  width: min(760px, 100%);
+  margin: 0 auto;
+  border-left: 0;
+}
+@media (max-width: 720px) {
+  .panel:not([data-full]) {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    z-index: 5;
+  }
 }
 @keyframes slide {
   from {

@@ -13,16 +13,18 @@ import { Header } from './features/sync/Header';
 import { SyncLog } from './features/sync/SyncLog';
 import { syncStore } from './features/sync/SyncStore';
 import { Toasts } from './features/sync/Toasts';
-import { useRoute } from './router';
+import { boardPath, cardPath, navigate, useRoute } from './router';
 import styles from './App.module.css';
 
 interface BoardScreenProps {
   slug: string;
+  /** /b/:slug/c/:key renders that card as a page instead of the board. */
+  cardKey: string | null;
   viewer: ReturnType<typeof useViewer>;
   onSignIn: () => void;
 }
 
-function BoardScreen({ slug, viewer, onSignIn }: BoardScreenProps) {
+function BoardScreen({ slug, cardKey, viewer, onSignIn }: BoardScreenProps) {
   const { board, loading, error, move, create, rename, edit, remove, tailPosition, setViewing } =
     useBoard(slug);
   useBoardEvents(board?.id);
@@ -32,9 +34,28 @@ function BoardScreen({ slug, viewer, onSignIn }: BoardScreenProps) {
     setViewing(id);
   };
   const open = openId ? (board?.cards.find(c => c.id === openId) ?? null) : null;
+  const page = cardKey ? (board?.cards.find(c => c.key === cardKey) ?? null) : null;
   if (loading) return <p className={styles.status}>Loading…</p>;
   if (error) return <p className={styles.status}>Could not load the board: {error.message}</p>;
   if (!board) return <p className={styles.status}>No board at /b/{slug}.</p>;
+  const columns = [...board.columns].sort((a, b) => a.position - b.position);
+  const panelFor = (card: NonNullable<typeof open>, full: boolean) => (
+    <CardPanel
+      card={card}
+      columns={columns}
+      full={full}
+      fullHref={cardPath(slug, card.key)}
+      boardHref={boardPath(slug)}
+      onClose={() => (full ? navigate(boardPath(slug)) : setOpenId(null))}
+      onSave={fields => edit(card, fields)}
+      onMove={columnId => move(card.id, { columnId, position: tailPosition(columnId) })}
+      onDelete={() => {
+        if (full) navigate(boardPath(slug));
+        else setOpenId(null);
+        remove(card.id);
+      }}
+    />
+  );
   return (
     <>
       <Header
@@ -44,28 +65,41 @@ function BoardScreen({ slug, viewer, onSignIn }: BoardScreenProps) {
         onSignIn={onSignIn}
         onLogOut={viewer.logOut}
       />
-      <Board
-        board={board}
-        onMove={move}
-        onCreate={create}
-        onRename={rename}
-        onDelete={card => remove(card.id)}
-        onOpen={card => setOpenId(card.id)}
-      />
-      {open ? (
-        <CardPanel
-          card={open}
-          columns={[...board.columns].sort((a, b) => a.position - b.position)}
-          onClose={() => setOpenId(null)}
-          onSave={fields => edit(open, fields)}
-          onMove={columnId => move(open.id, { columnId, position: tailPosition(columnId) })}
-          onDelete={() => {
-            setOpenId(null);
-            remove(open.id);
-          }}
-        />
-      ) : null}
-      <SyncLog />
+      {cardKey ? (
+        <div className={styles.body}>
+          {page ? (
+            panelFor(page, true)
+          ) : (
+            <p className={styles.status}>
+              No card {cardKey} on this board.{' '}
+              <a
+                href={boardPath(slug)}
+                onClick={e => {
+                  e.preventDefault();
+                  navigate(boardPath(slug));
+                }}
+              >
+                Back to the board
+              </a>
+            </p>
+          )}
+        </div>
+      ) : (
+        <div className={styles.body}>
+          <div className={styles.main}>
+            <Board
+              board={board}
+              onMove={move}
+              onCreate={create}
+              onRename={rename}
+              onDelete={card => remove(card.id)}
+              onOpen={card => setOpenId(card.id)}
+            />
+            <SyncLog />
+          </div>
+          {open ? panelFor(open, false) : null}
+        </div>
+      )}
     </>
   );
 }
@@ -79,7 +113,12 @@ function Screen() {
   return (
     <>
       {route.kind === 'board' ? (
-        <BoardScreen slug={route.slug} viewer={viewer} onSignIn={() => setSignIn(true)} />
+        <BoardScreen
+          slug={route.slug}
+          cardKey={route.cardKey}
+          viewer={viewer}
+          onSignIn={() => setSignIn(true)}
+        />
       ) : (
         <Home />
       )}
