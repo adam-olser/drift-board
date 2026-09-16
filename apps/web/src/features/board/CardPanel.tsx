@@ -4,11 +4,16 @@ import type { CardFieldsFragment, ColumnFieldsFragment } from '@/gql/graphql';
 import { initials } from '@/features/sync/initials';
 import { hhmmss, OP_LABEL, statusText } from '@/features/sync/SyncLog';
 import { syncStore } from '@/features/sync/SyncStore';
+import { navigate } from '@/router';
 import styles from './CardPanel.module.css';
 
 interface Props {
   card: CardFieldsFragment;
   columns: readonly ColumnFieldsFragment[];
+  /** Full-page variant at /b/:slug/c/:key; the panel variant links to it. */
+  full?: boolean;
+  fullHref: string;
+  boardHref: string;
   onClose: () => void;
   onSave: (fields: { title: string; description: string }) => void;
   onMove: (columnId: string) => void;
@@ -19,6 +24,9 @@ interface Props {
 export const CardPanel = observer(function CardPanel({
   card,
   columns,
+  full = false,
+  fullHref,
+  boardHref,
   onClose,
   onSave,
   onMove,
@@ -49,7 +57,12 @@ export const CardPanel = observer(function CardPanel({
   const viewers = syncStore.viewersOf(card.id);
 
   return (
-    <aside className={styles.panel} aria-label={`Card ${card.key}`} onKeyDown={onKeyDown}>
+    <aside
+      className={styles.panel}
+      data-full={full || undefined}
+      aria-label={`Card ${card.key}`}
+      onKeyDown={onKeyDown}
+    >
       <div className={styles.top}>
         <div className={styles.topRight}>
           <span className={styles.key}>{card.key}</span>
@@ -67,6 +80,30 @@ export const CardPanel = observer(function CardPanel({
         </div>
         <div className={styles.topRight}>
           <span className={styles.pill}>⌘ ↵ save</span>
+          {full ? (
+            <a
+              className={styles.pill}
+              href={boardHref}
+              onClick={e => {
+                e.preventDefault();
+                navigate(boardHref);
+              }}
+            >
+              ← Board
+            </a>
+          ) : (
+            <a
+              className={styles.pill}
+              href={fullHref}
+              onClick={e => {
+                e.preventDefault();
+                navigate(fullHref);
+              }}
+              title="Open as a page"
+            >
+              Full view ↗
+            </a>
+          )}
           <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
             <svg
               width="16"
@@ -125,7 +162,8 @@ export const CardPanel = observer(function CardPanel({
             className={styles.description}
             value={description}
             onChange={e => setDescription(e.target.value)}
-            maxLength={4000}
+            maxLength={5000}
+            placeholder="Notes, links, acceptance criteria… up to 5,000 characters. Line breaks are kept."
           />
           <span className={styles.note}>
             Version-checked save · earlier writer wins · no live co-editing of text (named scope
