@@ -10,7 +10,7 @@ export const presenceResolvers = {
   Subscription: {
     boardEvents: {
       subscribe: async (_p, { boardId }, ctx: Context) => {
-        if (!ctx.session || !ctx.conn) throw unauthenticated();
+        if (!ctx.session || !ctx.conn || !ctx.pubsub) throw unauthenticated();
         // why: Mercurius shallow-copies the context per operation, so the shared `conn` object is
         // the only thing onDisconnect can see. One board per connection.
         ctx.conn.boardId = boardId;
