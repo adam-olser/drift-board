@@ -43,3 +43,13 @@
 .done {
   color: var(--muted);
 }
+
+.row {
+  cursor: grab;
+  touch-action: none;
+}
+
+.dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}

@@ -1,5 +1,17 @@
+import { useState } from 'react';
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCorners,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import type { SeedBoard, SeedCard } from './seed';
 import { Column } from './Column';
+import { planMove, type DropTarget } from './moves';
 import styles from './Board.module.css';
 
 interface Props {
@@ -18,20 +30,42 @@ export function cardsByColumn(cards: readonly SeedCard[]): Map<string, SeedCard[
   return groups;
 }
 
+function toDropTarget(overId: string): DropTarget {
+  return overId.startsWith('column:')
+    ? { kind: 'column', id: overId.slice('column:'.length) }
+    : { kind: 'card', id: overId };
+}
+
 export function Board({ board }: Props) {
-  const grouped = cardsByColumn(board.cards);
+  // Milestone 1: local state. From T2.7 this becomes the Apollo cache + moveCard mutation.
+  const [cards, setCards] = useState<readonly SeedCard[]>(board.cards);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const onDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over) return;
+    const plan = planMove(cards, String(active.id), toDropTarget(String(over.id)));
+    if (!plan) return;
+    setCards(prev => prev.map(c => (c.id === active.id ? { ...c, ...plan } : c)));
+  };
+
+  const grouped = cardsByColumn(cards);
   const columns = [...board.columns].sort((a, b) => a.position - b.position);
   const last = columns.at(-1);
   return (
-    <main className={styles.board}>
-      {columns.map(column => (
-        <Column
-          key={column.id}
-          column={column}
-          cards={grouped.get(column.id) ?? []}
-          done={column === last}
-        />
-      ))}
-    </main>
+    <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={onDragEnd}>
+      <main className={styles.board}>
+        {columns.map(column => (
+          <Column
+            key={column.id}
+            column={column}
+            cards={grouped.get(column.id) ?? []}
+            done={column === last}
+          />
+        ))}
+      </main>
+    </DndContext>
   );
 }
