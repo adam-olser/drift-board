@@ -308,6 +308,22 @@ Each task is one commit (or two). "Done when" is the verification, executed, not
 ### Milestone 10 — Phone layout (stretch)
 - [x] T10.1 Column tabs, long-press move sheet, log collapsed to bottom bar per Mobile artboard.
 
+### Post-launch — UI fixes and card detail fields (user feedback, 2026-09-16)
+- [x] T11.1 Sign-in dialog closable by backdrop click, plus an in-dialog disclaimer that this is a
+      demo: passwords are scrypt-hashed but there is no password reset or email verification.
+      logIn hashes a dummy value for an unknown email so the timing does not leak which one failed.
+- [x] T11.2 Header brand links home; the card detail panel lays out beside the board (flex row)
+      instead of covering it, so the header stays reachable while a card is open.
+- [x] T11.3 Card detail gets its own page at `/b/:slug/c/:key` (same `CardPanel`, a `full` variant),
+      linked from the panel and shareable/bookmarkable/loads directly with no prior session.
+- [x] T11.4 Card detail fields: priority (enum), due date, assignee (any connected peer or past
+      board editor), and per-board labels (create-or-reuse, case-insensitive). Same `updateCard`
+      optimistic-concurrency path for priority/dueDate/assignee; `addLabel`/`removeLabel` are their
+      own idempotent mutations. `CardRow` shows compact chips for all four.
+  *Done when* the four fields set in one browser appear on the row and in the panel of a second
+  browser within the socket's normal latency, survive a reload via the card's permalink, and the
+  full Postgres integration suite (including 6 new cases) plus `pnpm lint`/`typecheck`/`test` pass.
+
 ## 6. Environment
 
 `.env.example`
