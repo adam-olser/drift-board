@@ -1,34 +1,54 @@
 import { ApolloProvider } from '@apollo/client';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createApolloClient } from './apollo/client';
 import { Board } from './features/board/Board';
+import { CardPanel } from './features/board/CardPanel';
 import { useBoard } from './features/board/useBoard';
 import { useBoardEvents } from './features/board/useBoardEvents';
 import { Home } from './features/boards/Home';
 import { NameDialog } from './features/session/NameDialog';
 import { useViewer } from './features/session/useViewer';
-import { Avatars } from './features/sync/Avatars';
+import { Header } from './features/sync/Header';
+import { SyncLog } from './features/sync/SyncLog';
 import { syncStore } from './features/sync/SyncStore';
 import { Toasts } from './features/sync/Toasts';
 import { useRoute } from './router';
 import styles from './App.module.css';
 
-function BoardScreen({ slug }: { slug: string }) {
-  const { board, loading, error, move, create, rename, remove } = useBoard(slug);
+function BoardScreen({ slug, me }: { slug: string; me: string | null }) {
+  const { board, loading, error, move, create, rename, edit, remove, tailPosition } =
+    useBoard(slug);
   useBoardEvents(board?.id);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const open = openId ? (board?.cards.find(c => c.id === openId) ?? null) : null;
   if (loading) return <p className={styles.status}>Loading…</p>;
   if (error) return <p className={styles.status}>Could not load the board: {error.message}</p>;
   if (!board) return <p className={styles.status}>No board at /b/{slug}.</p>;
   return (
     <>
-      <Avatars />
+      <Header slug={slug} boardName={board.name} me={me} />
       <Board
         board={board}
         onMove={move}
         onCreate={create}
         onRename={rename}
         onDelete={card => remove(card.id)}
+        onOpen={card => setOpenId(card.id)}
       />
+      {open ? (
+        <CardPanel
+          card={open}
+          columns={[...board.columns].sort((a, b) => a.position - b.position)}
+          onClose={() => setOpenId(null)}
+          onSave={fields => edit(open, fields)}
+          onMove={columnId => move(open.id, { columnId, position: tailPosition(columnId) })}
+          onDelete={() => {
+            setOpenId(null);
+            remove(open.id);
+          }}
+        />
+      ) : null}
+      <SyncLog />
     </>
   );
 }
@@ -40,7 +60,11 @@ function Screen() {
   if (viewer.loading) return null;
   return (
     <>
-      {route.kind === 'board' ? <BoardScreen slug={route.slug} /> : <Home />}
+      {route.kind === 'board' ? (
+        <BoardScreen slug={route.slug} me={viewer.session?.displayName ?? null} />
+      ) : (
+        <Home />
+      )}
       {viewer.session ? null : (
         <NameDialog
           boardName={board?.name}

@@ -2,6 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { observer } from 'mobx-react-lite';
 import { useState, type KeyboardEvent } from 'react';
+import { initials } from '@/features/sync/initials';
 import { syncStore } from '@/features/sync/SyncStore';
 import type { CardFieldsFragment } from '@/gql/graphql';
 import styles from './CardRow.module.css';
@@ -92,7 +93,7 @@ export const CardRowView = observer(function CardRowView({
         style={{ background: card.updatedBy.color }}
         title={`Last edited by ${card.updatedBy.name}`}
       >
-        {card.updatedBy.name}
+        {initials(card.updatedBy.name)}
       </span>
     </div>
   );
@@ -103,13 +104,15 @@ interface Props {
   done?: boolean;
   onRename: (title: string) => void;
   onDelete: () => void;
+  /** Click anywhere but the title (which double-clicks to rename) opens the detail panel. */
+  onOpen: () => void;
 }
 
 /**
  * Sortable row in a column. While dragging, the source dims and the overlay carries the card.
  * Delete/Backspace on the focused row deletes it; the detail panel (M7) adds a button.
  */
-export function CardRow({ card, done = false, onRename, onDelete }: Props) {
+export function CardRow({ card, done = false, onRename, onDelete, onOpen }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: card.id,
   });
@@ -123,6 +126,10 @@ export function CardRow({ card, done = false, onRename, onDelete }: Props) {
       onKeyDown={e => {
         if (e.key === 'Delete' || e.key === 'Backspace') onDelete();
         else listeners?.['onKeyDown']?.(e);
+      }}
+      onClick={e => {
+        const target = e.target as HTMLElement;
+        if (!target.closest('input') && !target.closest('span[class*="_title_"]')) onOpen();
       }}
     >
       <CardRowView card={card} done={done} onRename={onRename} />

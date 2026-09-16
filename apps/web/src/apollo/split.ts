@@ -34,6 +34,8 @@ export const wsClient = createClient({
   on: {
     connected: () => syncStore.replay(),
     closed: () => syncStore.setConnection('offline'),
+    ping: received => received || syncStore.pingSent(),
+    pong: received => received && syncStore.pongReceived(),
   },
 });
 

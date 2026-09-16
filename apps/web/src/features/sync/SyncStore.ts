@@ -11,6 +11,12 @@ export interface LogEntry {
   vars: Record<string, unknown>;
   status: 'ok' | 'error' | 'pending';
   ms: number;
+  /** Card the op touched, when it is a card mutation. */
+  cardId: string | null;
+  /** Card key from the result, once it landed. */
+  key?: string;
+  /** Error code from the server, when rejected. */
+  error?: string;
 }
 
 /** An operation parked while offline; forwarded by replay() (T6.3). */
@@ -38,6 +44,10 @@ export class SyncStore {
   toasts: Toast[] = [];
   peers: PresenceFieldsFragment[] = [];
   replayProgress: { done: number; total: number } | null = null;
+  /** graphql-ws ping → pong round trip, for the header pill. */
+  latencyMs: number | null = null;
+  offlineSince: number | null = null;
+  private pingSentAt = 0;
   private client: ApolloClient<unknown> | null = null;
   private nextToast = 1;
 
@@ -53,16 +63,36 @@ export class SyncStore {
   }
 
   setConnection(state: Connection) {
+    if (state === 'offline' && this.connection !== 'offline') this.offlineSince = Date.now();
+    if (state !== 'offline') this.offlineSince = null;
     this.connection = state;
+  }
+
+  pingSent() {
+    this.pingSentAt = Date.now();
+  }
+
+  pongReceived() {
+    this.latencyMs = Date.now() - this.pingSentAt;
   }
 
   setPeers(peers: PresenceFieldsFragment[]) {
     this.peers = peers;
   }
 
-  addLog(entry: LogEntry) {
+  addLog(entry: LogEntry): LogEntry {
     this.log.push(entry);
     if (this.log.length > 200) this.log.shift(); // ponytail: ring buffer by shift, fine at 200
+    return this.log[this.log.length - 1] as LogEntry;
+  }
+
+  settleLog(entry: LogEntry, patch: Partial<LogEntry>) {
+    Object.assign(entry, patch);
+  }
+
+  /** History rows for the card panel, newest first. */
+  logFor(cardId: string): LogEntry[] {
+    return this.log.filter(e => e.cardId === cardId).reverse();
   }
 
   toast(message: string, kind: ToastKind = 'error') {
