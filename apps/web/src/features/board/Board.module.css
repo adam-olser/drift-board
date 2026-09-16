@@ -6,3 +6,41 @@
   flex-grow: 1;
   min-height: 0;
 }
+
+.board[data-phone] {
+  grid-template-columns: minmax(0, 1fr);
+  padding: 14px 16px;
+  gap: 8px;
+}
+.board[data-phone] > section > header {
+  display: none; /* the tab already names the column */
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--line);
+  padding: 0 8px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 10px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.tab[data-active] {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+.tabCount {
+  font-family: var(--font-mono);
+  color: var(--dim);
+}

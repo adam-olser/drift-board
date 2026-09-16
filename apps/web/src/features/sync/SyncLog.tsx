@@ -80,7 +80,7 @@ export const SyncLog = observer(function SyncLog() {
               {syncStore.queue.length} queued
             </span>
           ) : null}
-          <span className={styles.pill}>⌘ .</span>
+          <span className={`${styles.pill} ${styles.shortcut}`}>⌘ .</span>
         </span>
       </button>
       {open ? (

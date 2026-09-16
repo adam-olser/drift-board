@@ -171,3 +171,20 @@
 .signIn:disabled {
   opacity: 0.5;
 }
+
+@media (max-width: 720px) {
+  .header {
+    padding: 8px 16px 10px;
+  }
+  .slug,
+  .me,
+  .email,
+  .count,
+  .board {
+    display: none;
+  }
+  .left,
+  .right {
+    gap: 10px;
+  }
+}

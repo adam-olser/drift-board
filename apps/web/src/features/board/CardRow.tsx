@@ -126,6 +126,7 @@ export function CardRow({ card, done = false, onRename, onDelete, onOpen }: Prop
   return (
     <div
       ref={setNodeRef}
+      data-card-id={card.id}
       className={isDragging ? styles.source : undefined}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       {...attributes}

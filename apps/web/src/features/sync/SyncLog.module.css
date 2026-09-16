@@ -78,3 +78,13 @@
 .row[data-status='error'] .op {
   color: var(--info);
 }
+
+@media (max-width: 720px) {
+  .last,
+  .shortcut {
+    display: none;
+  }
+  .bar {
+    padding: 10px 16px 28px;
+  }
+}

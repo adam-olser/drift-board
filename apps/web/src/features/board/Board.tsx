@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -16,7 +16,9 @@ import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import type { BoardQuery, CardFieldsFragment } from '@/gql/graphql';
 import { Column } from './Column';
 import { CardRowView } from './CardRow';
+import { MoveSheet } from './MoveSheet';
 import { planMove, type DropTarget, type MovePlan } from './moves';
+import { usePhone } from './usePhone';
 import styles from './Board.module.css';
 
 export type BoardData = NonNullable<BoardQuery['board']>;
@@ -60,8 +62,14 @@ function toDropTarget(overId: string): DropTarget {
     : { kind: 'card', id: overId };
 }
 
+const LONG_PRESS_MS = 500;
+
 export function Board({ board, onMove, onCreate, onRename, onDelete, onOpen }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const phone = usePhone();
+  const [tab, setTab] = useState<string | null>(null);
+  const [sheetId, setSheetId] = useState<string | null>(null);
+  const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
@@ -79,6 +87,32 @@ export function Board({ board, onMove, onCreate, onRename, onDelete, onOpen }: P
   const columns = [...board.columns].sort((a, b) => a.position - b.position);
   const last = columns.at(-1);
   const activeCard = activeId ? board.cards.find(c => c.id === activeId) : undefined;
+  const current = columns.find(c => c.id === tab) ?? columns[0];
+  const shown = phone && current ? [current] : columns;
+  const sheetCard = sheetId ? board.cards.find(c => c.id === sheetId) : undefined;
+
+  // Mobile artboard: long-press a card to move it. Event delegation on the board; the row
+  // carries data-card-id. Any movement or release before the timer cancels it.
+  const cancelPress = () => {
+    if (pressTimer.current) clearTimeout(pressTimer.current);
+    pressTimer.current = null;
+  };
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (!phone) return;
+    const id = (e.target as HTMLElement).closest<HTMLElement>('[data-card-id]')?.dataset['cardId'];
+    if (!id) return;
+    cancelPress();
+    pressTimer.current = setTimeout(() => setSheetId(id), LONG_PRESS_MS);
+  };
+  const moveToTail = (card: CardFieldsFragment, columnId: string) => {
+    const tail = (grouped.get(columnId) ?? []).at(-1);
+    const plan = planMove(
+      board.cards,
+      card.id,
+      tail ? { kind: 'card', id: tail.id } : { kind: 'column', id: columnId }
+    );
+    onMove(card.id, plan ?? { columnId, position: (tail?.position ?? 0) + 1024 });
+  };
   return (
     <DndContext
       sensors={sensors}
@@ -87,8 +121,31 @@ export function Board({ board, onMove, onCreate, onRename, onDelete, onOpen }: P
       onDragEnd={onDragEnd}
       onDragCancel={() => setActiveId(null)}
     >
-      <main className={styles.board}>
-        {columns.map(column => (
+      {phone ? (
+        <nav className={styles.tabs} aria-label="Columns">
+          {columns.map(column => (
+            <button
+              type="button"
+              key={column.id}
+              className={styles.tab}
+              data-active={column.id === current?.id || undefined}
+              onClick={() => setTab(column.id)}
+            >
+              <span>{column.title}</span>
+              <span className={styles.tabCount}>{(grouped.get(column.id) ?? []).length}</span>
+            </button>
+          ))}
+        </nav>
+      ) : null}
+      <main
+        className={styles.board}
+        data-phone={phone || undefined}
+        onPointerDown={onPointerDown}
+        onPointerUp={cancelPress}
+        onPointerMove={cancelPress}
+        onPointerCancel={cancelPress}
+      >
+        {shown.map(column => (
           <Column
             key={column.id}
             column={column}
@@ -104,6 +161,14 @@ export function Board({ board, onMove, onCreate, onRename, onDelete, onOpen }: P
       <DragOverlay dropAnimation={null}>
         {activeCard ? <CardRowView card={activeCard} overlay /> : null}
       </DragOverlay>
+      {sheetCard ? (
+        <MoveSheet
+          card={sheetCard}
+          columns={columns}
+          onMove={columnId => moveToTail(sheetCard, columnId)}
+          onClose={() => setSheetId(null)}
+        />
+      ) : null}
     </DndContext>
   );
 }
