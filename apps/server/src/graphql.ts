@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import mercurius, { type IResolvers } from 'mercurius';
+import mercurius, { type IResolvers, type MercuriusContext } from 'mercurius';
 import { Kind, type DocumentNode } from 'graphql';
 import type { Resolvers } from './gql/types';
 import { rateLimited } from './errors';
@@ -14,9 +14,21 @@ import { cardResolvers } from './modules/cards/resolvers';
 import { onDisconnect, presenceResolvers } from './modules/presence/resolvers';
 import { bindPubsub } from './modules/events';
 
-/** Per-request context handed to every resolver. `session` is null until startGuestSession. */
+/**
+ * Per-request context handed to every resolver. `session` is null until startGuestSession.
+ * `pubsub` is Mercurius's own field, present on every operation once subscriptions are
+ * registered (including plain queries and mutations, not only subscribe resolvers); it is
+ * typed here, not just on MercuriusContext, so every resolver can publish without a cast.
+ */
 export interface Context {
   request: FastifyRequest;
+  /**
+   * Mercurius's own field, merged into the context after buildContext runs. Present on every
+   * operation once subscriptions are registered, so it is safe to use unguarded in resolvers
+   * that only run over the socket (e.g. the boardEvents subscribe resolver); optional here
+   * because buildContext, which this type also describes, does not set it.
+   */
+  pubsub?: MercuriusContext['pubsub'];
   /** Absent over the socket; only the HTTP-only session mutations touch it. */
   reply: FastifyReply;
   session: SessionRow | null;

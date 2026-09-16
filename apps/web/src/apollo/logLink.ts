@@ -42,11 +42,12 @@ export const logLink = new ApolloLink((operation, forward) => {
     const sub = forward(operation).subscribe({
       next: result => {
         const error = result.errors?.[0];
+        const key = keyOf(result.data as Record<string, unknown> | null) ?? entry.key;
         syncStore.settleLog(entry, {
           status: error ? 'error' : 'ok',
           ms: Date.now() - ts,
-          key: keyOf(result.data as Record<string, unknown> | null) ?? entry.key,
-          error: error ? String(error.extensions?.['code'] ?? error.message) : undefined,
+          ...(key ? { key } : {}),
+          ...(error ? { error: String(error.extensions?.['code'] ?? error.message) } : {}),
         });
         observer.next(result);
       },
