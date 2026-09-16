@@ -6,12 +6,21 @@
     "dev": "tsx watch --env-file=../../.env src/index.ts",
     "build": "esbuild src/index.ts --bundle --platform=node --target=node22 --format=esm --packages=external --outfile=dist/index.js",
     "start": "node dist/index.js",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "codegen": "graphql-codegen --config codegen.ts"
   },
   "dependencies": {
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/rate-limit": "^10.3.0",
+    "fastify": "^5.12.5",
+    "graphql": "^16.14.2",
+    "mercurius": "^16.10.0",
     "pg": "^8.16.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.7",
+    "@graphql-codegen/typescript": "^4.1.6",
+    "@graphql-codegen/typescript-resolvers": "^4.5.2",
     "@types/node": "^22.0.0",
     "@types/pg": "^8.15.0",
     "esbuild": "^0.25.0",

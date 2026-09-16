@@ -1,0 +1,132 @@
+"""
+ISO-8601 timestamp, stamped server-side.
+"""
+scalar DateTime
+
+type Board {
+  id: ID!
+  slug: String!
+  name: String!
+  keyPrefix: String!
+  columns: [Column!]!
+  """
+  One flat list; the client groups by columnId and sorts by position.
+  """
+  cards: [Card!]!
+}
+
+type Column {
+  id: ID!
+  title: String!
+  position: Int!
+}
+
+type Card {
+  id: ID!
+  key: String!
+  title: String!
+  description: String!
+  columnId: ID!
+  position: Float!
+  """
+  Bumped only by updateCard. Moves never touch it.
+  """
+  version: Int!
+  updatedAt: DateTime!
+  updatedBy: Peer!
+}
+
+type Peer {
+  sessionId: ID!
+  name: String!
+  color: String!
+}
+
+type Presence {
+  sessionId: ID!
+  name: String!
+  color: String!
+  viewingCardId: ID
+}
+
+type Session {
+  id: ID!
+  displayName: String!
+  color: String!
+  user: User
+}
+
+type User {
+  id: ID!
+  email: String!
+  name: String!
+}
+
+type Viewer {
+  session: Session
+  boards: [Board!]!
+}
+
+type Query {
+  board(slug: String!): Board
+  viewer: Viewer!
+}
+
+type Mutation {
+  # ---- HTTP only: these set the cookie
+  startGuestSession(displayName: String!): Session!
+  signUp(email: String!, password: String!, name: String!): Session!
+  logIn(email: String!, password: String!): Session!
+  logOut: Session!
+
+  # ---- socket, no opId (cannot happen offline)
+  createBoard(name: String!): Board!
+
+  # ---- socket, each carries a client-generated opId; id on createCard is client-generated too
+  createCard(
+    opId: ID!
+    id: ID!
+    boardId: ID!
+    columnId: ID!
+    title: String!
+    position: Float!
+  ): Card!
+  updateCard(opId: ID!, cardId: ID!, baseVersion: Int!, title: String, description: String): Card!
+  """
+  Returns every card the move (or a resulting reindex) touched.
+  """
+  moveCard(opId: ID!, cardId: ID!, columnId: ID!, position: Float!): [Card!]!
+  deleteCard(opId: ID!, cardId: ID!): ID!
+
+  # ---- socket, no opId, no ledger row, no Postgres
+  setViewing(boardId: ID!, cardId: ID): Boolean!
+}
+
+"""
+Every event carries origin = the session that caused it; a client ignores its own events.
+"""
+type CardCreated {
+  origin: ID!
+  card: Card!
+}
+type CardUpdated {
+  origin: ID!
+  card: Card!
+}
+type CardMoved {
+  origin: ID!
+  cards: [Card!]!
+}
+type CardDeleted {
+  origin: ID!
+  cardId: ID!
+}
+type PresenceChanged {
+  origin: ID!
+  peers: [Presence!]!
+}
+union BoardEvent = CardCreated | CardUpdated | CardMoved | CardDeleted | PresenceChanged
+
+type Subscription {
+  boardEvents(boardId: ID!): BoardEvent!
+}
