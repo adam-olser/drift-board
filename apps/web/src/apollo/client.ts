@@ -1,9 +1,12 @@
-import { ApolloClient, HttpLink } from '@apollo/client';
+import { ApolloClient, from } from '@apollo/client';
+import { syncStore } from '@/features/sync/SyncStore';
 import { createCache } from './cache';
+import { logLink } from './logLink';
+import { transportLink } from './split';
 
-/** Milestone 2: HTTP only. The socket, log, queue and lag links arrive in Milestones 4–6. */
-export const createApolloClient = () =>
-  new ApolloClient({
-    link: new HttpLink({ uri: '/graphql', credentials: 'same-origin' }),
-    cache: createCache(),
-  });
+/** Link chain `log → split(session ops → http, else → ws)`; queue and lag links arrive in M5–6. */
+export function createApolloClient() {
+  const client = new ApolloClient({ link: from([logLink, transportLink]), cache: createCache() });
+  syncStore.attach(client);
+  return client;
+}
