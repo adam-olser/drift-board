@@ -227,15 +227,15 @@ Each task is one commit (or two). "Done when" is the verification, executed, not
 
 ### Milestone 1 — Static board (~3 h)
 
-- [ ] **T1.1 Scaffold** — `git init`, root `package.json`, `pnpm-workspace.yaml`, `tsconfig.base.json` (`strict`, `noUncheckedIndexedAccess`, `paths` for `@/*` and `@shared/*`), Prettier (ganba-hero config), ESLint flat config with `typescript-eslint` recommended + `eslint-plugin-react-hooks`, `.gitignore`, `.editorconfig`. Root scripts above. `DECISIONS.md` already exists; add a line if anything here changes.
+- [x] **T1.1 Scaffold** — `git init`, root `package.json`, `pnpm-workspace.yaml`, `tsconfig.base.json` (`strict`, `noUncheckedIndexedAccess`, `paths` for `@/*` and `@shared/*`), Prettier (ganba-hero config), ESLint flat config with `typescript-eslint` recommended + `eslint-plugin-react-hooks`, `.gitignore`, `.editorconfig`. Root scripts above. `DECISIONS.md` already exists; add a line if anything here changes.
   *Done when* `pnpm lint && pnpm typecheck` pass on an empty workspace.
-- [ ] **T1.2 `shared/ordering.ts`** (aliased as `@shared/ordering` in both apps' tsconfig and Vite/esbuild) — `between(a: number | null, b: number | null): number`, `POSITION_MIN_GAP = 1e-6`, `needsReindex(positions: number[]): boolean`, `reindex(n: number): number[]` (evenly spaced from 1024). Vitest colocated.
+- [x] **T1.2 `shared/ordering.ts`** (aliased as `@shared/ordering` in both apps' tsconfig and Vite/esbuild) — `between(a: number | null, b: number | null): number`, `POSITION_MIN_GAP = 1e-6`, `needsReindex(positions: number[]): boolean`, `reindex(n: number): number[]` (evenly spaced from 1024). Vitest colocated.
   *Done when* tests cover: empty column, head, tail, between, gap exhaustion.
-- [ ] **T1.3 `apps/web` scaffold** — Vite + React + TS, `tokens.css` from `design/Components.dc.html` (both theme sets as CSS variables on `[data-theme]`), `theme.css` base. No components yet.
+- [x] **T1.3 `apps/web` scaffold** — Vite + React + TS, `tokens.css` from `design/Components.dc.html` (both theme sets as CSS variables on `[data-theme]`), `theme.css` base. No components yet.
   *Done when* the dev server shows a blank page in the dark token colours.
-- [ ] **T1.4 Board layout** — `Board.tsx` (3-column grid), `Column.tsx`, `CardRow.tsx` (key, title, last-editor chip = `updatedBy`; there is no assignee in the model) per `design/Main.dc.html`, seeded local state shaped like the GraphQL `Board` type. No header yet.
+- [x] **T1.4 Board layout** — `Board.tsx` (3-column grid), `Column.tsx`, `CardRow.tsx` (key, title, last-editor chip = `updatedBy`; there is no assignee in the model) per `design/Main.dc.html`, seeded local state shaped like the GraphQL `Board` type. No header yet.
   *Done when* it looks like the Main artboard's board area, minus header and log.
-- [ ] **T1.5 Drag and drop** — `@dnd-kit/core` + `@dnd-kit/sortable` with `KeyboardSensor` on; `moves.ts` is pure: `(cards, activeId, over) → { columnId, position }` via `between` from the drop target's neighbours.
+- [x] **T1.5 Drag and drop** — `@dnd-kit/core` + `@dnd-kit/sortable` with `KeyboardSensor` on; `moves.ts` is pure: `(cards, activeId, over) → { columnId, position }` via `between` from the drop target's neighbours.
   *Done when* `moves.test.ts` covers drop at head, tail, between, into an empty column, onto itself; and cards visibly drag within and across columns.
 
 ### Milestone 2 — API + Postgres + guest sessions (~8 h)
