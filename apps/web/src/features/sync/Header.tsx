@@ -5,6 +5,7 @@ import type { SessionFieldsFragment } from '@/gql/graphql';
 import { Brand } from './Brand';
 import { initials } from './initials';
 import { syncStore } from './SyncStore';
+import { navigate } from '@/router';
 import { setTheme, useTheme } from '@/theme';
 import styles from './Header.module.css';
 
@@ -53,10 +54,17 @@ export const Header = observer(function Header({
     <>
       <header className={styles.header} data-state={connection}>
         <div className={styles.left}>
-          <span className={styles.brand}>
+          <a
+            className={styles.brand}
+            href="/"
+            onClick={e => {
+              e.preventDefault();
+              navigate('/');
+            }}
+          >
             <Brand color={`var(--${tone})`} />
             Driftboard
-          </span>
+          </a>
           <span className={styles.slug}>/b/{slug}</span>
           <span className={styles.board}>{boardName}</span>
         </div>
