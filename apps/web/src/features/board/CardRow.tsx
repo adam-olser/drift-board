@@ -1,10 +1,10 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import type { SeedCard } from './seed';
+import type { CardFieldsFragment } from '@/gql/graphql';
 import styles from './CardRow.module.css';
 
 interface ViewProps {
-  card: SeedCard;
+  card: CardFieldsFragment;
   done?: boolean;
   /** The copy rendered in the DragOverlay, following the pointer. */
   overlay?: boolean;
@@ -31,7 +31,7 @@ export function CardRowView({ card, done = false, overlay = false }: ViewProps) 
 }
 
 interface Props {
-  card: SeedCard;
+  card: CardFieldsFragment;
   done?: boolean;
 }
 

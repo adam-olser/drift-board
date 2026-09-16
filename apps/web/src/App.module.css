@@ -4,3 +4,9 @@
   flex-direction: column;
   overflow: hidden;
 }
+
+.status {
+  margin: 0;
+  padding: 24px 20px;
+  color: var(--muted);
+}

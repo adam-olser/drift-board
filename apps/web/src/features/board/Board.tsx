@@ -13,19 +13,25 @@ import {
   type DragStartEvent,
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import type { SeedBoard, SeedCard } from './seed';
+import type { BoardQuery, CardFieldsFragment } from '@/gql/graphql';
 import { Column } from './Column';
 import { CardRowView } from './CardRow';
-import { planMove, type DropTarget } from './moves';
+import { planMove, type DropTarget, type MovePlan } from './moves';
 import styles from './Board.module.css';
 
+export type BoardData = NonNullable<BoardQuery['board']>;
+
 interface Props {
-  board: SeedBoard;
+  board: BoardData;
+  /** Called with the planned placement when a drag ends somewhere meaningful. */
+  onMove: (cardId: string, plan: MovePlan) => void;
 }
 
 /** Group the flat card list by column, sorted by position. */
-export function cardsByColumn(cards: readonly SeedCard[]): Map<string, SeedCard[]> {
-  const groups = new Map<string, SeedCard[]>();
+export function cardsByColumn(
+  cards: readonly CardFieldsFragment[]
+): Map<string, CardFieldsFragment[]> {
+  const groups = new Map<string, CardFieldsFragment[]>();
   for (const card of cards) {
     const list = groups.get(card.columnId);
     if (list) list.push(card);
@@ -50,9 +56,7 @@ function toDropTarget(overId: string): DropTarget {
     : { kind: 'card', id: overId };
 }
 
-export function Board({ board }: Props) {
-  // Milestone 1: local state. From T2.7 this becomes the Apollo cache + moveCard mutation.
-  const [cards, setCards] = useState<readonly SeedCard[]>(board.cards);
+export function Board({ board, onMove }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -63,15 +67,14 @@ export function Board({ board }: Props) {
   const onDragEnd = ({ active, over }: DragEndEvent) => {
     setActiveId(null);
     if (!over) return;
-    const plan = planMove(cards, String(active.id), toDropTarget(String(over.id)));
-    if (!plan) return;
-    setCards(prev => prev.map(c => (c.id === active.id ? { ...c, ...plan } : c)));
+    const plan = planMove(board.cards, String(active.id), toDropTarget(String(over.id)));
+    if (plan) onMove(String(active.id), plan);
   };
 
-  const grouped = cardsByColumn(cards);
+  const grouped = cardsByColumn(board.cards);
   const columns = [...board.columns].sort((a, b) => a.position - b.position);
   const last = columns.at(-1);
-  const activeCard = activeId ? cards.find(c => c.id === activeId) : undefined;
+  const activeCard = activeId ? board.cards.find(c => c.id === activeId) : undefined;
   return (
     <DndContext
       sensors={sensors}

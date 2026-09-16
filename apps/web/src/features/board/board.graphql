@@ -1,0 +1,36 @@
+fragment CardFields on Card {
+  id
+  key
+  title
+  description
+  columnId
+  position
+  version
+  updatedAt
+  updatedBy {
+    sessionId
+    name
+    color
+  }
+}
+
+fragment ColumnFields on Column {
+  id
+  title
+  position
+}
+
+query Board($slug: String!) {
+  board(slug: $slug) {
+    id
+    slug
+    name
+    keyPrefix
+    columns {
+      ...ColumnFields
+    }
+    cards {
+      ...CardFields
+    }
+  }
+}

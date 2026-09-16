@@ -1,14 +1,14 @@
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import type { SeedCard, SeedColumn } from './seed';
+import type { CardFieldsFragment, ColumnFieldsFragment } from '@/gql/graphql';
 import { CardRow } from './CardRow';
 import styles from './Column.module.css';
 
 export const columnDropId = (columnId: string) => `column:${columnId}`;
 
 interface Props {
-  column: SeedColumn;
-  cards: readonly SeedCard[];
+  column: ColumnFieldsFragment;
+  cards: readonly CardFieldsFragment[];
   done?: boolean;
 }
 

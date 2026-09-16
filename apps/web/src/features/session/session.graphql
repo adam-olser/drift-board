@@ -1,0 +1,19 @@
+fragment SessionFields on Session {
+  id
+  displayName
+  color
+}
+
+query Viewer {
+  viewer {
+    session {
+      ...SessionFields
+    }
+  }
+}
+
+mutation StartGuestSession($displayName: String!) {
+  startGuestSession(displayName: $displayName) {
+    ...SessionFields
+  }
+}
