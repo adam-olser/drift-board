@@ -82,3 +82,44 @@ mutation CreateCard(
 mutation DeleteCard($opId: ID!, $cardId: ID!) {
   deleteCard(opId: $opId, cardId: $cardId)
 }
+
+fragment PresenceFields on Presence {
+  sessionId
+  name
+  color
+  viewingCardId
+}
+
+subscription BoardEvents($boardId: ID!) {
+  boardEvents(boardId: $boardId) {
+    __typename
+    ... on CardCreated {
+      origin
+      card {
+        ...CardFields
+      }
+    }
+    ... on CardUpdated {
+      origin
+      card {
+        ...CardFields
+      }
+    }
+    ... on CardMoved {
+      origin
+      cards {
+        ...CardFields
+      }
+    }
+    ... on CardDeleted {
+      origin
+      cardId
+    }
+    ... on PresenceChanged {
+      origin
+      peers {
+        ...PresenceFields
+      }
+    }
+  }
+}
