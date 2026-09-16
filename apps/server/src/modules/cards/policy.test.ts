@@ -113,13 +113,24 @@ describe.skipIf(!available)('card policy (Postgres)', () => {
         baseVersion: 1,
         title: 'Build responsive nav (v2)',
         description: null,
+        priority: undefined,
+        dueDate: undefined,
+        assigneeSessionId: undefined,
       })
     );
     expect(updated.result.version).toBe(2);
     expect(updated.result.updatedBy.name).toBe('MK');
     let caught: unknown;
     await tx(t =>
-      policy.updateCard(t, ADA, { cardId: id, baseVersion: 1, title: 'Stale', description: null })
+      policy.updateCard(t, ADA, {
+        cardId: id,
+        baseVersion: 1,
+        title: 'Stale',
+        description: null,
+        priority: undefined,
+        dueDate: undefined,
+        assigneeSessionId: undefined,
+      })
     ).catch(e => (caught = e));
     const err = caught as {
       extensions: { code: string; current: { version: number; title: string } };
@@ -146,9 +157,98 @@ describe.skipIf(!available)('card policy (Postgres)', () => {
         baseVersion: before,
         title: 'Photograph the workshop!',
         description: null,
+        priority: undefined,
+        dueDate: undefined,
+        assigneeSessionId: undefined,
       })
     );
     expect(edited.result.version).toBe(before + 1);
+  });
+
+  it('updateCard: priority, due date and assignee set, clear, and reject an unknown assignee', async () => {
+    const id = await cardIdByKey('DB-11');
+    const set = await tx(t =>
+      policy.updateCard(t, ADA, {
+        cardId: id,
+        baseVersion: 1,
+        title: null,
+        description: null,
+        priority: 'high',
+        dueDate: '2026-12-01',
+        assigneeSessionId: MK,
+      })
+    );
+    expect(set.result.priority).toBe('HIGH');
+    expect(set.result.dueDate).toBe('2026-12-01');
+    expect(set.result.assignee?.sessionId).toBe(MK);
+
+    const untouched = await tx(t =>
+      policy.updateCard(t, ADA, {
+        cardId: id,
+        baseVersion: 2,
+        title: null,
+        description: 'still here',
+        priority: undefined,
+        dueDate: undefined,
+        assigneeSessionId: undefined,
+      })
+    );
+    expect(untouched.result.priority).toBe('HIGH');
+    expect(untouched.result.dueDate).toBe('2026-12-01');
+    expect(untouched.result.assignee?.sessionId).toBe(MK);
+
+    const cleared = await tx(t =>
+      policy.updateCard(t, ADA, {
+        cardId: id,
+        baseVersion: 3,
+        title: null,
+        description: null,
+        priority: undefined,
+        dueDate: null,
+        assigneeSessionId: null,
+      })
+    );
+    expect(cleared.result.dueDate).toBeNull();
+    expect(cleared.result.assignee).toBeNull();
+
+    expect(
+      await code(
+        tx(t =>
+          policy.updateCard(t, ADA, {
+            cardId: id,
+            baseVersion: 4,
+            title: null,
+            description: null,
+            priority: undefined,
+            dueDate: undefined,
+            assigneeSessionId: randomUUID(),
+          })
+        )
+      )
+    ).toBe('NOT_FOUND');
+  });
+
+  it('addLabel creates or reuses a board label case-insensitively; removeLabel is idempotent', async () => {
+    const id = await cardIdByKey('DB-09');
+    const first = await tx(t =>
+      policy.addLabel(t, ADA, { cardId: id, name: 'Bug', color: '#ff7b72' })
+    );
+    expect(first.result.labels.map(l => l.name)).toEqual(['Bug']);
+    const labelId = first.result.labels[0]!.id;
+
+    // same name, different case, different colour: reuses the label, keeps its stored colour
+    const reused = await tx(t =>
+      policy.addLabel(t, ADA, { cardId: id, name: 'bug', color: '#000000' })
+    );
+    expect(reused.result.labels).toHaveLength(1);
+    expect(reused.result.labels[0]!.id).toBe(labelId);
+    expect(reused.result.labels[0]!.color).toBe('#ff7b72');
+
+    const removed = await tx(t => policy.removeLabel(t, ADA, { cardId: id, labelId }));
+    expect(removed.result.labels).toEqual([]);
+    // removing again is a no-op, not an error
+    const removedAgain = await tx(t => policy.removeLabel(t, ADA, { cardId: id, labelId }));
+    expect(removedAgain.result.labels).toEqual([]);
   });
 
   it('deleteCard is idempotent; later ops on the card are CARD_GONE', async () => {

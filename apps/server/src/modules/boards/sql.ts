@@ -18,7 +18,7 @@ export interface ColumnRow {
 }
 
 /** What Query.board / Viewer.boards return; `columns` and `cards` are field resolvers. */
-export type BoardParent = Omit<Board, 'columns' | 'cards'>;
+export type BoardParent = Omit<Board, 'columns' | 'cards' | 'labels'>;
 
 export const toBoard = (row: BoardRow): BoardParent => ({
   id: row.id,

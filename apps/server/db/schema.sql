@@ -48,6 +48,9 @@ create table cards (
   key                   text not null,
   title                 text not null,
   description           text not null default '',
+  priority              text not null default 'none' check (priority in ('none', 'low', 'medium', 'high')),
+  due_date              date null,
+  assignee_session_id   uuid null references sessions(id) on delete set null,
   position              double precision not null,
   version               integer not null default 1,
   updated_at            timestamptz not null default now(),
@@ -57,12 +60,29 @@ create table cards (
   unique (board_id, key)
 );
 create index cards_live_order on cards (board_id, column_id, position) where deleted_at is null;
+create index cards_assignee on cards (assignee_session_id) where assignee_session_id is not null;
+
+-- Labels are per-board so the picker only ever shows this board's set (D-025).
+create table labels (
+  id        uuid primary key default gen_random_uuid(),
+  board_id  uuid not null references boards(id) on delete cascade,
+  name      text not null,
+  color     text not null,
+  unique (board_id, name)
+);
+
+create table card_labels (
+  card_id  uuid not null references cards(id) on delete cascade,
+  label_id uuid not null references labels(id) on delete cascade,
+  primary key (card_id, label_id)
+);
+create index card_labels_label on card_labels (label_id);
 
 create table ops (
   op_id       uuid primary key,
   session_id  uuid not null references sessions(id),
   board_id    uuid not null references boards(id) on delete cascade,
-  type        text not null check (type in ('createCard', 'updateCard', 'moveCard', 'deleteCard')),
+  type        text not null check (type in ('createCard', 'updateCard', 'moveCard', 'deleteCard', 'addLabel', 'removeLabel')),
   result      jsonb not null,
   applied_at  timestamptz not null default now()
 );

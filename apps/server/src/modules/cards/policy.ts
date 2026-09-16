@@ -8,17 +8,21 @@ import { needsReindex, reindex } from '@shared/ordering';
 import type { Card } from '../../gql/types';
 import { badInput, cardGone, notFound, versionMismatch } from '../../errors';
 import {
+  attachLabel,
   columnBelongsToBoard,
-  findCard,
+  detachLabel,
+  findCardWithLabels,
+  findLabelByName,
   findOpResult,
   insertCard,
+  insertLabel,
   insertOp,
-  listLiveCardsInColumn,
+  listLiveCardsInColumnWithLabels,
   lockCard,
   nextKey,
+  sessionBelongsToBoard,
   setPositions,
   softDeleteCard,
-  toCard,
   updateCardPlacement,
   updateCardText,
   type CardRow,
@@ -55,9 +59,9 @@ async function loadLiveCard(tx: Tx, cardId: string): Promise<CardRow> {
 }
 
 async function reloadCard(tx: Tx, id: string): Promise<Card> {
-  const row = await findCard(tx, id);
-  if (!row) throw new Error(`card ${id} vanished inside its own transaction`);
-  return toCard(row);
+  const card = await findCardWithLabels(tx, id);
+  if (!card) throw new Error(`card ${id} vanished inside its own transaction`);
+  return card;
 }
 
 export async function createCard(
@@ -67,7 +71,7 @@ export async function createCard(
 ): Promise<Applied<Card>> {
   if (!Number.isFinite(input.position)) throw badInput('position must be a finite number.');
   if (!(await columnBelongsToBoard(tx, input.columnId, input.boardId))) throw notFound('Column');
-  if (await findCard(tx, input.id)) throw badInput('A card with this id already exists.');
+  if (await findCardWithLabels(tx, input.id)) throw badInput('A card with this id already exists.');
   const key = await nextKey(tx, input.boardId);
   await insertCard(tx, { ...input, key, sessionId });
   return { result: await reloadCard(tx, input.id), boardId: input.boardId, changed: true };
@@ -77,13 +81,31 @@ export async function createCard(
 export async function updateCard(
   tx: Tx,
   sessionId: string,
-  input: { cardId: string; baseVersion: number; title: string | null; description: string | null }
-): Promise<Applied<Card>> {
-  if (input.title === null && input.description === null) {
-    throw badInput('Nothing to update.');
+  input: {
+    cardId: string;
+    baseVersion: number;
+    title: string | null;
+    description: string | null;
+    priority: string | undefined;
+    dueDate: string | null | undefined;
+    assigneeSessionId: string | null | undefined;
   }
+): Promise<Applied<Card>> {
+  const nothingToDo =
+    input.title === null &&
+    input.description === null &&
+    input.priority === undefined &&
+    input.dueDate === undefined &&
+    input.assigneeSessionId === undefined;
+  if (nothingToDo) throw badInput('Nothing to update.');
   const row = await loadLiveCard(tx, input.cardId);
-  if (row.version !== input.baseVersion) throw versionMismatch(toCard(row));
+  if (row.version !== input.baseVersion) throw versionMismatch(await reloadCard(tx, row.id));
+  if (
+    input.assigneeSessionId != null &&
+    !(await sessionBelongsToBoard(tx, input.assigneeSessionId, row.board_id))
+  ) {
+    throw notFound('Assignee');
+  }
   await updateCardText(tx, { id: row.id, ...input, sessionId });
   return { result: await reloadCard(tx, row.id), boardId: row.board_id, changed: true };
 }
@@ -99,14 +121,14 @@ export async function moveCard(
   if (!(await columnBelongsToBoard(tx, input.columnId, row.board_id))) throw notFound('Column');
   await updateCardPlacement(tx, { id: row.id, ...input, sessionId });
 
-  const column = await listLiveCardsInColumn(tx, input.columnId);
+  const column = await listLiveCardsInColumnWithLabels(tx, input.columnId);
   if (!needsReindex(column.map(c => c.position))) {
     return { result: [await reloadCard(tx, row.id)], boardId: row.board_id, changed: true };
   }
   const ids = column.map(c => c.id);
   await setPositions(tx, ids, reindex(ids.length));
-  const touched = await listLiveCardsInColumn(tx, input.columnId);
-  return { result: touched.map(toCard), boardId: row.board_id, changed: true };
+  const touched = await listLiveCardsInColumnWithLabels(tx, input.columnId);
+  return { result: touched, boardId: row.board_id, changed: true };
 }
 
 /** Soft delete; deleting an already-deleted card succeeds without an event. */
@@ -120,4 +142,29 @@ export async function deleteCard(
   if (row.deleted_at) return { result: row.id, boardId: row.board_id, changed: false };
   await softDeleteCard(tx, row.id, sessionId);
   return { result: row.id, boardId: row.board_id, changed: true };
+}
+
+/** Creates the board's label by that name if it does not exist yet (case-insensitive), else reuses it. */
+export async function addLabel(
+  tx: Tx,
+  _sessionId: string,
+  input: { cardId: string; name: string; color: string }
+): Promise<Applied<Card>> {
+  const row = await loadLiveCard(tx, input.cardId);
+  const existing = await findLabelByName(tx, row.board_id, input.name);
+  const label =
+    existing ??
+    (await insertLabel(tx, { boardId: row.board_id, name: input.name, color: input.color }));
+  await attachLabel(tx, row.id, label.id);
+  return { result: await reloadCard(tx, row.id), boardId: row.board_id, changed: true };
+}
+
+export async function removeLabel(
+  tx: Tx,
+  _sessionId: string,
+  input: { cardId: string; labelId: string }
+): Promise<Applied<Card>> {
+  const row = await loadLiveCard(tx, input.cardId);
+  await detachLabel(tx, row.id, input.labelId);
+  return { result: await reloadCard(tx, row.id), boardId: row.board_id, changed: true };
 }

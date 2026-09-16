@@ -2,6 +2,17 @@
 ISO-8601 timestamp, stamped server-side.
 """
 scalar DateTime
+"""
+Calendar date, no time component: "2026-09-30".
+"""
+scalar Date
+
+enum Priority {
+  NONE
+  LOW
+  MEDIUM
+  HIGH
+}
 
 type Board {
   id: ID!
@@ -13,6 +24,7 @@ type Board {
   One flat list; the client groups by columnId and sorts by position.
   """
   cards: [Card!]!
+  labels: [Label!]!
 }
 
 type Column {
@@ -28,12 +40,22 @@ type Card {
   description: String!
   columnId: ID!
   position: Float!
+  priority: Priority!
+  dueDate: Date
+  assignee: Peer
+  labels: [Label!]!
   """
   Bumped only by updateCard. Moves never touch it.
   """
   version: Int!
   updatedAt: DateTime!
   updatedBy: Peer!
+}
+
+type Label {
+  id: ID!
+  name: String!
+  color: String!
 }
 
 type Peer {
@@ -91,7 +113,22 @@ type Mutation {
     title: String!
     position: Float!
   ): Card!
-  updateCard(opId: ID!, cardId: ID!, baseVersion: Int!, title: String, description: String): Card!
+  updateCard(
+    opId: ID!
+    cardId: ID!
+    baseVersion: Int!
+    title: String
+    description: String
+    priority: Priority
+    """
+    Pass an explicit null to clear the due date; omit to leave it unchanged.
+    """
+    dueDate: Date
+    """
+    Session id to assign, or an explicit null to unassign; omit to leave it unchanged.
+    """
+    assigneeSessionId: ID
+  ): Card!
   """
   Returns every card the move (or a resulting reindex) touched.
   """
@@ -100,6 +137,12 @@ type Mutation {
 
   # ---- socket, no opId, no ledger row, no Postgres
   setViewing(boardId: ID!, cardId: ID): Boolean!
+
+  """
+  Creates the label if the board has none by that name yet (case-insensitive), else reuses it.
+  """
+  addLabel(opId: ID!, cardId: ID!, name: String!, color: String!): Card!
+  removeLabel(opId: ID!, cardId: ID!, labelId: ID!): Card!
 }
 
 """

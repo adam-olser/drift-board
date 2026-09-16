@@ -1,4 +1,5 @@
 import { ApolloProvider } from '@apollo/client';
+import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo, useState } from 'react';
 import { createApolloClient } from './apollo/client';
 import { Board } from './features/board/Board';
@@ -24,9 +25,26 @@ interface BoardScreenProps {
   onSignIn: () => void;
 }
 
-function BoardScreen({ slug, cardKey, viewer, onSignIn }: BoardScreenProps) {
-  const { board, loading, error, move, create, rename, edit, remove, tailPosition, setViewing } =
-    useBoard(slug);
+const BoardScreen = observer(function BoardScreen({
+  slug,
+  cardKey,
+  viewer,
+  onSignIn,
+}: BoardScreenProps) {
+  const {
+    board,
+    loading,
+    error,
+    move,
+    create,
+    rename,
+    edit,
+    remove,
+    addLabel,
+    removeLabel,
+    tailPosition,
+    setViewing,
+  } = useBoard(slug);
   useBoardEvents(board?.id);
   const [openId, setOpenIdState] = useState<string | null>(null);
   const setOpenId = (id: string | null) => {
@@ -39,10 +57,25 @@ function BoardScreen({ slug, cardKey, viewer, onSignIn }: BoardScreenProps) {
   if (error) return <p className={styles.status}>Could not load the board: {error.message}</p>;
   if (!board) return <p className={styles.status}>No board at /b/{slug}.</p>;
   const columns = [...board.columns].sort((a, b) => a.position - b.position);
+  // Everyone assignable: connected peers (live) plus anyone who has ever edited a card here
+  // (may be offline now), deduped by session id, connected peers' colours winning.
+  const peerMap = new Map(board.cards.map(c => [c.updatedBy.sessionId, c.updatedBy]));
+  for (const p of syncStore.peers)
+    peerMap.set(p.sessionId, { sessionId: p.sessionId, name: p.name, color: p.color });
+  if (viewer.session) {
+    peerMap.set(viewer.session.id, {
+      sessionId: viewer.session.id,
+      name: viewer.session.displayName,
+      color: viewer.session.color,
+    });
+  }
+  const peers = [...peerMap.values()];
   const panelFor = (card: NonNullable<typeof open>, full: boolean) => (
     <CardPanel
       card={card}
       columns={columns}
+      peers={peers}
+      boardLabels={board.labels}
       full={full}
       fullHref={cardPath(slug, card.key)}
       boardHref={boardPath(slug)}
@@ -54,6 +87,8 @@ function BoardScreen({ slug, cardKey, viewer, onSignIn }: BoardScreenProps) {
         else setOpenId(null);
         remove(card.id);
       }}
+      onAddLabel={(name, color) => addLabel(card, name, color)}
+      onRemoveLabel={labelId => removeLabel(card, labelId)}
     />
   );
   return (
@@ -102,7 +137,7 @@ function BoardScreen({ slug, cardKey, viewer, onSignIn }: BoardScreenProps) {
       )}
     </>
   );
-}
+});
 
 function Screen() {
   const route = useRoute();

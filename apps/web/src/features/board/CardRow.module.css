@@ -96,3 +96,43 @@
   color: var(--ok);
   flex-shrink: 0;
 }
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.labelDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.priorityDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  background: var(--muted);
+}
+.priorityDot[data-priority='low'] {
+  background: var(--info);
+}
+.priorityDot[data-priority='medium'] {
+  background: var(--queued);
+}
+.priorityDot[data-priority='high'] {
+  background: var(--error);
+}
+
+.due {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--dim);
+}
+.due[data-overdue] {
+  color: var(--error);
+}
