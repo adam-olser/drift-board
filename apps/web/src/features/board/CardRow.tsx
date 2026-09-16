@@ -31,6 +31,9 @@ export function CardRowView({ card, done = false, overlay = false, onRename }: V
     if (title && title !== card.title) onRename?.(title);
   };
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    // why: the row is a dnd-kit sortable; Enter/Space bubbling up would start a keyboard drag
+    // that never ends and blocks every later pointer drag.
+    e.stopPropagation();
     if (e.key === 'Enter') commit();
     if (e.key === 'Escape') setEditing(false);
   };
@@ -45,6 +48,7 @@ export function CardRowView({ card, done = false, overlay = false, onRename }: V
           onChange={e => setDraft(e.target.value)}
           onBlur={commit}
           onKeyDown={onKeyDown}
+          onPointerDown={e => e.stopPropagation()}
           maxLength={200}
           autoFocus
           aria-label={`Title of ${card.key}`}
