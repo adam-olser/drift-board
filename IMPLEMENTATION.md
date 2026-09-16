@@ -288,11 +288,11 @@ Each task is one commit (or two). "Done when" is the verification, executed, not
 
 ### Milestone 7 — Designed UI (~6 h)
 
-- [ ] **T7.1 `Header.tsx`** — states 1, 3, 4 from HeaderStates artboard, driven only by `SyncStore`; offline banner; `Syncing i / n`. Latency pill only if `graphql-ws` `ping`/`pong` timing is one line, else the pill reads `WS`.
-- [ ] **T7.2 Theme switch** — `data-theme` on `<html>`, `localStorage`, `prefers-color-scheme` default.
-- [ ] **T7.3 `SyncLog.tsx`** — collapsible dev panel over `store.log`, row styles from Components artboard, `⌘.` toggles.
-- [ ] **T7.4 `CardPanel.tsx`** — slide-in per CardDetail artboard, `⌘↵` saves with `baseVersion`, history rows filtered from `store.log` by card.
-- [ ] **T7.5 README** — one paragraph, honest use case, Linear context, "Not built" list (currently Milestones 8–10).
+- [x] **T7.1 `Header.tsx`** — states 1, 3, 4 from HeaderStates artboard, driven only by `SyncStore`; offline banner; `Syncing i / n`. Latency pill only if `graphql-ws` `ping`/`pong` timing is one line, else the pill reads `WS`.
+- [x] **T7.2 Theme switch** — `data-theme` on `<html>`, `localStorage`, `prefers-color-scheme` default.
+- [x] **T7.3 `SyncLog.tsx`** — collapsible dev panel over `store.log`, row styles from Components artboard, `⌘.` toggles.
+- [x] **T7.4 `CardPanel.tsx`** — slide-in per CardDetail artboard, `⌘↵` saves with `baseVersion`, history rows filtered from `store.log` by card.
+- [x] **T7.5 README** — one paragraph, honest use case, Linear context, "Not built" list (currently Milestones 8–10).
   *Done when* the four-step walkthrough runs end to end on the live URL, timed under 90 seconds.
 
 **Core demo complete.** Tag `v0.1`.
