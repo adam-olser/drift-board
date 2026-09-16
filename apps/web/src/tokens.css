@@ -1,0 +1,69 @@
+/* Design tokens — lifted verbatim from design/Components.dc.html (THEMES). Presence colours are
+   per-session data, not tokens. Theme is selected by data-theme on <html>. */
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #121317;
+  --surface: #1b1d22;
+  --well: #0e0f12;
+  --border: #2a2d34;
+  --border-strong: #3a3e47;
+  --line: #23262d;
+  --text: #e6e4df;
+  --muted: #9aa0ab;
+  --dim: #7d8390;
+  --faint: #5f6570;
+  --ok: #b7f26a;
+  --queued: #ffb86b;
+  --queued-border: #4a3a22;
+  --queued-bg: #2a2014;
+  --info: #8fb8ff;
+  --info-border: #223560;
+  --info-bg: #14203a;
+  --error: #ff7b72;
+  --error-border: #4a2a28;
+  --btn-bg: #e6e4df;
+  --btn-fg: #101114;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --sun-bg: transparent;
+  --sun-fg: #7d8390;
+  --moon-bg: #2a2d34;
+  --moon-fg: #e6e4df;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f3f4f2;
+  --surface: #ffffff;
+  --well: #e9ebe8;
+  --border: #d6d9d5;
+  --border-strong: #b8bcb7;
+  --line: #dfe2de;
+  --text: #1c1b19;
+  --muted: #5f6570;
+  --dim: #8a8f98;
+  --faint: #a3a8b0;
+  --ok: #3f7d12;
+  --queued: #b25f0b;
+  --queued-border: #ead2b3;
+  --queued-bg: #fbf0e3;
+  --info: #2b5fc9;
+  --info-border: #c3d2f3;
+  --info-bg: #e9effc;
+  --error: #c0392b;
+  --error-border: #f0c2bc;
+  --btn-bg: #1c1b19;
+  --btn-fg: #f3f4f2;
+  --shadow: rgba(20, 22, 26, 0.18);
+  --sun-bg: #d6d9d5;
+  --sun-fg: #1c1b19;
+  --moon-bg: transparent;
+  --moon-fg: #8a8f98;
+}
+
+:root {
+  --font-sans: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', Menlo, monospace;
+  --radius: 3px;
+  --chip-fg: #101114; /* text on presence-coloured chips, same in both themes */
+}
