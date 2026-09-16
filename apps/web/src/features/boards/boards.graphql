@@ -1,0 +1,17 @@
+query MyBoards {
+  viewer {
+    boards {
+      id
+      slug
+      name
+    }
+  }
+}
+
+mutation CreateBoard($name: String!) {
+  createBoard(name: $name) {
+    id
+    slug
+    name
+  }
+}

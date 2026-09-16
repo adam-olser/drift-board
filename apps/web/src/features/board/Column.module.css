@@ -32,3 +32,18 @@
 .add:hover {
   color: var(--muted);
 }
+
+.addForm {
+  display: flex;
+}
+
+.addInput {
+  flex-grow: 1;
+  font-size: 13px;
+  padding: 9px 10px;
+  min-height: 44px;
+  background: var(--well);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--text);
+}

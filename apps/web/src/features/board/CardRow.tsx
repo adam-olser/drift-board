@@ -1,5 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useState, type KeyboardEvent } from 'react';
 import type { CardFieldsFragment } from '@/gql/graphql';
 import styles from './CardRow.module.css';
 
@@ -8,17 +9,55 @@ interface ViewProps {
   done?: boolean;
   /** The copy rendered in the DragOverlay, following the pointer. */
   overlay?: boolean;
+  onRename?: ((title: string) => void) | undefined;
 }
 
 /** Presentational row: used in the column and, as a copy, inside the DragOverlay. */
-export function CardRowView({ card, done = false, overlay = false }: ViewProps) {
+export function CardRowView({ card, done = false, overlay = false, onRename }: ViewProps) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(card.title);
   const classes = [styles.row, done && styles.done, overlay && styles.overlay]
     .filter(Boolean)
     .join(' ');
+
+  const startEditing = () => {
+    if (!onRename) return;
+    setDraft(card.title);
+    setEditing(true);
+  };
+  const commit = () => {
+    setEditing(false);
+    const title = draft.trim();
+    if (title && title !== card.title) onRename?.(title);
+  };
+  const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') commit();
+    if (e.key === 'Escape') setEditing(false);
+  };
+
   return (
-    <div className={classes}>
+    <div className={classes} data-editing={editing || undefined}>
       <span className={styles.key}>{card.key}</span>
-      <span className={styles.title}>{card.title}</span>
+      {editing ? (
+        <input
+          className={styles.titleInput}
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={onKeyDown}
+          maxLength={200}
+          autoFocus
+          aria-label={`Title of ${card.key}`}
+        />
+      ) : (
+        <span
+          className={styles.title}
+          onDoubleClick={startEditing}
+          title={onRename ? 'Double-click to rename' : undefined}
+        >
+          {card.title}
+        </span>
+      )}
       <span
         className={styles.chip}
         style={{ background: card.updatedBy.color }}
@@ -33,10 +72,11 @@ export function CardRowView({ card, done = false, overlay = false }: ViewProps) 
 interface Props {
   card: CardFieldsFragment;
   done?: boolean;
+  onRename: (title: string) => void;
 }
 
 /** Sortable row in a column. While dragging, the source dims and the overlay carries the card. */
-export function CardRow({ card, done = false }: Props) {
+export function CardRow({ card, done = false, onRename }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: card.id,
   });
@@ -48,7 +88,7 @@ export function CardRow({ card, done = false }: Props) {
       {...attributes}
       {...listeners}
     >
-      <CardRowView card={card} done={done} />
+      <CardRowView card={card} done={done} onRename={onRename} />
     </div>
   );
 }

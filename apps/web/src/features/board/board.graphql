@@ -34,3 +34,51 @@ query Board($slug: String!) {
     }
   }
 }
+
+mutation MoveCard($opId: ID!, $cardId: ID!, $columnId: ID!, $position: Float!) {
+  moveCard(opId: $opId, cardId: $cardId, columnId: $columnId, position: $position) {
+    ...CardFields
+  }
+}
+
+mutation UpdateCard(
+  $opId: ID!
+  $cardId: ID!
+  $baseVersion: Int!
+  $title: String
+  $description: String
+) {
+  updateCard(
+    opId: $opId
+    cardId: $cardId
+    baseVersion: $baseVersion
+    title: $title
+    description: $description
+  ) {
+    ...CardFields
+  }
+}
+
+mutation CreateCard(
+  $opId: ID!
+  $id: ID!
+  $boardId: ID!
+  $columnId: ID!
+  $title: String!
+  $position: Float!
+) {
+  createCard(
+    opId: $opId
+    id: $id
+    boardId: $boardId
+    columnId: $columnId
+    title: $title
+    position: $position
+  ) {
+    ...CardFields
+  }
+}
+
+mutation DeleteCard($opId: ID!, $cardId: ID!) {
+  deleteCard(opId: $opId, cardId: $cardId)
+}
