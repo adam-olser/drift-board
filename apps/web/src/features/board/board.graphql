@@ -5,6 +5,18 @@ fragment CardFields on Card {
   description
   columnId
   position
+  priority
+  dueDate
+  assignee {
+    sessionId
+    name
+    color
+  }
+  labels {
+    id
+    name
+    color
+  }
   version
   updatedAt
   updatedBy {
@@ -32,6 +44,11 @@ query Board($slug: String!) {
     cards {
       ...CardFields
     }
+    labels {
+      id
+      name
+      color
+    }
   }
 }
 
@@ -47,6 +64,9 @@ mutation UpdateCard(
   $baseVersion: Int!
   $title: String
   $description: String
+  $priority: Priority
+  $dueDate: Date
+  $assigneeSessionId: ID
 ) {
   updateCard(
     opId: $opId
@@ -54,7 +74,22 @@ mutation UpdateCard(
     baseVersion: $baseVersion
     title: $title
     description: $description
+    priority: $priority
+    dueDate: $dueDate
+    assigneeSessionId: $assigneeSessionId
   ) {
+    ...CardFields
+  }
+}
+
+mutation AddLabel($opId: ID!, $cardId: ID!, $name: String!, $color: String!) {
+  addLabel(opId: $opId, cardId: $cardId, name: $name, color: $color) {
+    ...CardFields
+  }
+}
+
+mutation RemoveLabel($opId: ID!, $cardId: ID!, $labelId: ID!) {
+  removeLabel(opId: $opId, cardId: $cardId, labelId: $labelId) {
     ...CardFields
   }
 }

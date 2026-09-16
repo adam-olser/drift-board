@@ -23,3 +23,21 @@ insert into cards (board_id, column_id, key, title, position, updated_by_session
   ('00000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-000000000013', 'DB-03', 'Agree on scope and timeline',           1024, '00000000-0000-4000-8000-00000000000a'),
   ('00000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-000000000013', 'DB-02', 'Choose type pairing',                   2048, '00000000-0000-4000-8000-00000000000b'),
   ('00000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-000000000013', 'DB-01', 'Send first invoice',                    3072, '00000000-0000-4000-8000-00000000000c');
+
+-- A couple of demo labels and detail fields, applied after insert so card versions stay at 1
+-- (the policy tests key off DB-13's baseVersion sequence starting there).
+insert into labels (board_id, name, color) values
+  ('00000000-0000-4000-8000-000000000001', 'Design',   '#8fb8ff'),
+  ('00000000-0000-4000-8000-000000000001', 'Urgent',   '#ff7b72');
+
+update cards set priority = 'high', due_date = '2026-10-01', assignee_session_id = '00000000-0000-4000-8000-00000000000b'
+  where key = 'DB-14';
+update cards set priority = 'medium', assignee_session_id = '00000000-0000-4000-8000-00000000000a'
+  where key = 'DB-13';
+
+insert into card_labels (card_id, label_id)
+  select c.id, l.id from cards c, labels l
+   where c.key = 'DB-14' and l.name = 'Urgent' and l.board_id = c.board_id;
+insert into card_labels (card_id, label_id)
+  select c.id, l.id from cards c, labels l
+   where c.key = 'DB-13' and l.name = 'Design' and l.board_id = c.board_id;

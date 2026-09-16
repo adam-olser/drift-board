@@ -17,6 +17,8 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  /** Calendar date, no time component: "2026-09-30". */
+  Date: { input: string; output: string; }
   /** ISO-8601 timestamp, stamped server-side. */
   DateTime: { input: string; output: string; }
 };
@@ -28,6 +30,7 @@ export type Board = {
   columns: Array<Column>;
   id: Scalars['ID']['output'];
   keyPrefix: Scalars['String']['output'];
+  labels: Array<Label>;
   name: Scalars['String']['output'];
   slug: Scalars['String']['output'];
 };
@@ -36,11 +39,15 @@ export type BoardEvent = CardCreated | CardDeleted | CardMoved | CardUpdated | P
 
 export type Card = {
   __typename?: 'Card';
+  assignee?: Maybe<Peer>;
   columnId: Scalars['ID']['output'];
   description: Scalars['String']['output'];
+  dueDate?: Maybe<Scalars['Date']['output']>;
   id: Scalars['ID']['output'];
   key: Scalars['String']['output'];
+  labels: Array<Label>;
   position: Scalars['Float']['output'];
+  priority: Priority;
   title: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
   updatedBy: Peer;
@@ -80,8 +87,17 @@ export type Column = {
   title: Scalars['String']['output'];
 };
 
+export type Label = {
+  __typename?: 'Label';
+  color: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  /** Creates the label if the board has none by that name yet (case-insensitive), else reuses it. */
+  addLabel: Card;
   createBoard: Board;
   createCard: Card;
   deleteCard: Scalars['ID']['output'];
@@ -89,10 +105,19 @@ export type Mutation = {
   logOut: Session;
   /** Returns every card the move (or a resulting reindex) touched. */
   moveCard: Array<Card>;
+  removeLabel: Card;
   setViewing: Scalars['Boolean']['output'];
   signUp: Session;
   startGuestSession: Session;
   updateCard: Card;
+};
+
+
+export type MutationAddLabelArgs = {
+  cardId: Scalars['ID']['input'];
+  color: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  opId: Scalars['ID']['input'];
 };
 
 
@@ -131,6 +156,13 @@ export type MutationMoveCardArgs = {
 };
 
 
+export type MutationRemoveLabelArgs = {
+  cardId: Scalars['ID']['input'];
+  labelId: Scalars['ID']['input'];
+  opId: Scalars['ID']['input'];
+};
+
+
 export type MutationSetViewingArgs = {
   boardId: Scalars['ID']['input'];
   cardId?: InputMaybe<Scalars['ID']['input']>;
@@ -150,10 +182,13 @@ export type MutationStartGuestSessionArgs = {
 
 
 export type MutationUpdateCardArgs = {
+  assigneeSessionId?: InputMaybe<Scalars['ID']['input']>;
   baseVersion: Scalars['Int']['input'];
   cardId: Scalars['ID']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
+  dueDate?: InputMaybe<Scalars['Date']['input']>;
   opId: Scalars['ID']['input'];
+  priority?: InputMaybe<Priority>;
   title?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -177,6 +212,12 @@ export type PresenceChanged = {
   origin: Scalars['ID']['output'];
   peers: Array<Presence>;
 };
+
+export type Priority =
+  | 'HIGH'
+  | 'LOW'
+  | 'MEDIUM'
+  | 'NONE';
 
 export type Query = {
   __typename?: 'Query';
@@ -304,14 +345,17 @@ export type ResolversTypes = {
   CardMoved: ResolverTypeWrapper<CardMoved>;
   CardUpdated: ResolverTypeWrapper<CardUpdated>;
   Column: ResolverTypeWrapper<Column>;
+  Date: ResolverTypeWrapper<Scalars['Date']['output']>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  Label: ResolverTypeWrapper<Label>;
   Mutation: ResolverTypeWrapper<{}>;
   Peer: ResolverTypeWrapper<Peer>;
   Presence: ResolverTypeWrapper<Presence>;
   PresenceChanged: ResolverTypeWrapper<PresenceChanged>;
+  Priority: Priority;
   Query: ResolverTypeWrapper<{}>;
   Session: ResolverTypeWrapper<SessionParent>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
@@ -331,10 +375,12 @@ export type ResolversParentTypes = {
   CardMoved: CardMoved;
   CardUpdated: CardUpdated;
   Column: Column;
+  Date: Scalars['Date']['output'];
   DateTime: Scalars['DateTime']['output'];
   Float: Scalars['Float']['output'];
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
+  Label: Label;
   Mutation: {};
   Peer: Peer;
   Presence: Presence;
@@ -352,6 +398,7 @@ export type BoardResolvers<ContextType = Context, ParentType extends ResolversPa
   columns?: Resolver<Array<ResolversTypes['Column']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   keyPrefix?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  labels?: Resolver<Array<ResolversTypes['Label']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -362,11 +409,15 @@ export type BoardEventResolvers<ContextType = Context, ParentType extends Resolv
 };
 
 export type CardResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Card'] = ResolversParentTypes['Card']> = {
+  assignee?: Resolver<Maybe<ResolversTypes['Peer']>, ParentType, ContextType>;
   columnId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  dueDate?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   key?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  labels?: Resolver<Array<ResolversTypes['Label']>, ParentType, ContextType>;
   position?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  priority?: Resolver<ResolversTypes['Priority'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   updatedBy?: Resolver<ResolversTypes['Peer'], ParentType, ContextType>;
@@ -405,17 +456,30 @@ export type ColumnResolvers<ContextType = Context, ParentType extends ResolversP
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
+  name: 'Date';
+}
+
 export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
   name: 'DateTime';
 }
 
+export type LabelResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Label'] = ResolversParentTypes['Label']> = {
+  color?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  addLabel?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationAddLabelArgs, 'cardId' | 'color' | 'name' | 'opId'>>;
   createBoard?: Resolver<ResolversTypes['Board'], ParentType, ContextType, RequireFields<MutationCreateBoardArgs, 'name'>>;
   createCard?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCreateCardArgs, 'boardId' | 'columnId' | 'id' | 'opId' | 'position' | 'title'>>;
   deleteCard?: Resolver<ResolversTypes['ID'], ParentType, ContextType, RequireFields<MutationDeleteCardArgs, 'cardId' | 'opId'>>;
   logIn?: Resolver<ResolversTypes['Session'], ParentType, ContextType, RequireFields<MutationLogInArgs, 'email' | 'password'>>;
   logOut?: Resolver<ResolversTypes['Session'], ParentType, ContextType>;
   moveCard?: Resolver<Array<ResolversTypes['Card']>, ParentType, ContextType, RequireFields<MutationMoveCardArgs, 'cardId' | 'columnId' | 'opId' | 'position'>>;
+  removeLabel?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationRemoveLabelArgs, 'cardId' | 'labelId' | 'opId'>>;
   setViewing?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationSetViewingArgs, 'boardId'>>;
   signUp?: Resolver<ResolversTypes['Session'], ParentType, ContextType, RequireFields<MutationSignUpArgs, 'email' | 'name' | 'password'>>;
   startGuestSession?: Resolver<ResolversTypes['Session'], ParentType, ContextType, RequireFields<MutationStartGuestSessionArgs, 'displayName'>>;
@@ -482,7 +546,9 @@ export type Resolvers<ContextType = Context> = {
   CardMoved?: CardMovedResolvers<ContextType>;
   CardUpdated?: CardUpdatedResolvers<ContextType>;
   Column?: ColumnResolvers<ContextType>;
+  Date?: GraphQLScalarType;
   DateTime?: GraphQLScalarType;
+  Label?: LabelResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Peer?: PeerResolvers<ContextType>;
   Presence?: PresenceResolvers<ContextType>;

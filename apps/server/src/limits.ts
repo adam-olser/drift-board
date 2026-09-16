@@ -16,3 +16,4 @@ export const BOARD_NAME_MAX = 80;
 export const EMAIL_MAX = 254;
 export const PASSWORD_MIN = 8;
 export const PASSWORD_MAX = 200;
+export const LABEL_NAME_MAX = 30;

@@ -3,7 +3,7 @@ import type { Resolvers } from '../../gql/types';
 import { pool, withTx } from '../../db';
 import { unauthenticated } from '../../errors';
 import { assertLength, BOARD_NAME_MAX } from '../../limits';
-import { listLiveCards, toCard } from '../cards/sql';
+import { listBoardLabels, listLiveCardsWithLabels } from '../cards/sql';
 import {
   findBoardBySlug,
   insertBoard,
@@ -72,6 +72,12 @@ export const boardResolvers = {
   },
   Board: {
     columns: async parent => (await listColumns(pool, parent.id)).map(toColumn),
-    cards: async parent => (await listLiveCards(pool, parent.id)).map(toCard),
+    cards: async parent => listLiveCardsWithLabels(pool, parent.id),
+    labels: async parent =>
+      (await listBoardLabels(pool, parent.id)).map(l => ({
+        id: l.id,
+        name: l.name,
+        color: l.color,
+      })),
   },
 } satisfies Resolvers;

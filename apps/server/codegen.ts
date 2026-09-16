@@ -8,7 +8,7 @@ const config: CodegenConfig = {
       config: {
         contextType: '../graphql#Context',
         strictScalars: true,
-        scalars: { DateTime: 'string' },
+        scalars: { DateTime: 'string', Date: 'string' },
         useTypeImports: true,
         enumsAsTypes: true,
         // Parents returned by resolvers; the remaining fields have their own field resolvers.

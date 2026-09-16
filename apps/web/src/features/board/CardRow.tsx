@@ -5,6 +5,7 @@ import { useState, type KeyboardEvent } from 'react';
 import { initials } from '@/features/sync/initials';
 import { syncStore } from '@/features/sync/SyncStore';
 import type { CardFieldsFragment } from '@/gql/graphql';
+import { isOverdue } from './CardPanel';
 import styles from './CardRow.module.css';
 
 interface ViewProps {
@@ -95,6 +96,41 @@ export const CardRowView = observer(function CardRowView({
           {initials(viewer.name)} editing
         </span>
       ) : null}
+      <span className={styles.meta}>
+        {card.labels.map(l => (
+          <span
+            key={l.id}
+            className={styles.labelDot}
+            style={{ background: l.color }}
+            title={l.name}
+          />
+        ))}
+        {card.priority !== 'NONE' ? (
+          <span
+            className={styles.priorityDot}
+            data-priority={card.priority.toLowerCase()}
+            title={`Priority: ${card.priority.toLowerCase()}`}
+          />
+        ) : null}
+        {card.dueDate ? (
+          <span
+            className={styles.due}
+            data-overdue={isOverdue(card.dueDate) || undefined}
+            title={`Due ${card.dueDate}`}
+          >
+            {card.dueDate.slice(5)}
+          </span>
+        ) : null}
+        {card.assignee && card.assignee.sessionId !== card.updatedBy.sessionId ? (
+          <span
+            className={styles.chip}
+            style={{ background: card.assignee.color }}
+            title={`Assigned to ${card.assignee.name}`}
+          >
+            {initials(card.assignee.name)}
+          </span>
+        ) : null}
+      </span>
       <span
         className={styles.chip}
         style={{ background: card.updatedBy.color }}
