@@ -1,0 +1,80 @@
+.wrap {
+  border-top: 1px solid var(--line);
+  background: var(--well);
+  flex-shrink: 0;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  text-align: left;
+  min-height: 36px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.last {
+  color: var(--faint);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.pill {
+  font-size: 10.5px;
+  padding: 2px 7px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.pill[data-tone='queued'] {
+  color: var(--queued);
+  border-color: var(--queued-border);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 6px 20px 12px;
+  max-height: 200px;
+  overflow: auto;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.ts {
+  color: var(--faint);
+}
+
+.op {
+  color: var(--muted);
+}
+.row[data-status='ok'] .op {
+  color: var(--ok);
+}
+.row[data-status='pending'] .op {
+  color: var(--queued);
+}
+.row[data-status='error'] .op {
+  color: var(--info);
+}
