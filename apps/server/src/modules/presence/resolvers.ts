@@ -25,7 +25,17 @@ export const presenceResolvers = {
     },
   },
   Mutation: {
-    setViewing: () => true,
+    // The named exception to the "same path" rule: presence never touches Postgres.
+    setViewing: (_p, { boardId, cardId }, ctx) => {
+      if (!ctx.session) throw unauthenticated();
+      const peers = presence.setViewing(boardId, ctx.session.id, cardId ?? null);
+      if (peers) {
+        publish(boardId, {
+          boardEvents: { __typename: 'PresenceChanged', origin: ctx.session.id, peers },
+        });
+      }
+      return peers !== null;
+    },
   },
 } satisfies Resolvers;
 

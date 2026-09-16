@@ -20,7 +20,8 @@ export function useBoardEvents(boardId: string | undefined) {
       const event = result?.boardEvents;
       if (!event || !boardId) return;
       if (event.__typename === 'PresenceChanged') {
-        syncStore.setPeers(event.peers);
+        // Presence events are the one kind we keep even when we caused them (setViewing).
+        syncStore.setPeers(event.peers, sessionId ?? null);
         // why: our own join event is the first thing the subscription delivers. Anything
         // published between the board query and this moment was missed; refetch once.
         if (live.current !== boardId) {

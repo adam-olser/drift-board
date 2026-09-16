@@ -303,7 +303,7 @@ Each task is one commit (or two). "Done when" is the verification, executed, not
 *Done when* Milestone 8's Verify line passes.
 
 ### Milestone 9 — Card-level presence (~2 h)
-- [ ] T9.1 `setViewing` writes the map and publishes; `CardRow` "editing" marker; panel "who's viewing".
+- [x] T9.1 `setViewing` writes the map and publishes; `CardRow` "editing" marker; panel "who's viewing".
 
 ### Milestone 10 — Phone layout (stretch)
 - [ ] T10.1 Column tabs, long-press move sheet, log collapsed to bottom bar per Mobile artboard.

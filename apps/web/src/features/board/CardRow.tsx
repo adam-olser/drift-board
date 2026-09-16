@@ -36,11 +36,13 @@ export const CardRowView = observer(function CardRowView({
     setEditing(false);
   };
   const queued = syncStore.isQueued(card.id);
+  const viewer = overlay ? undefined : syncStore.viewersOf(card.id)[0];
   const classes = [
     styles.row,
     done && styles.done,
     overlay && styles.overlay,
     queued && styles.queued,
+    viewer && styles.viewed,
   ]
     .filter(Boolean)
     .join(' ');
@@ -88,6 +90,11 @@ export const CardRowView = observer(function CardRowView({
         </span>
       )}
       {queued ? <span className={styles.status}>queued</span> : null}
+      {viewer ? (
+        <span className={styles.editing} title={`${viewer.name} has this card open`}>
+          {initials(viewer.name)} editing
+        </span>
+      ) : null}
       <span
         className={styles.chip}
         style={{ background: card.updatedBy.color }}

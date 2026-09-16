@@ -23,10 +23,14 @@ interface BoardScreenProps {
 }
 
 function BoardScreen({ slug, viewer, onSignIn }: BoardScreenProps) {
-  const { board, loading, error, move, create, rename, edit, remove, tailPosition } =
+  const { board, loading, error, move, create, rename, edit, remove, tailPosition, setViewing } =
     useBoard(slug);
   useBoardEvents(board?.id);
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [openId, setOpenIdState] = useState<string | null>(null);
+  const setOpenId = (id: string | null) => {
+    setOpenIdState(id);
+    setViewing(id);
+  };
   const open = openId ? (board?.cards.find(c => c.id === openId) ?? null) : null;
   if (loading) return <p className={styles.status}>Loading…</p>;
   if (error) return <p className={styles.status}>Could not load the board: {error.message}</p>;

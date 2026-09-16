@@ -43,6 +43,8 @@ export class SyncStore {
   queue: PendingOp[] = [];
   toasts: Toast[] = [];
   peers: PresenceFieldsFragment[] = [];
+  /** My session id, so card-level presence can leave me out. */
+  me: string | null = null;
   replayProgress: { done: number; total: number } | null = null;
   /** graphql-ws ping → pong round trip, for the header pill. */
   latencyMs: number | null = null;
@@ -76,8 +78,14 @@ export class SyncStore {
     this.latencyMs = Date.now() - this.pingSentAt;
   }
 
-  setPeers(peers: PresenceFieldsFragment[]) {
+  setPeers(peers: PresenceFieldsFragment[], me: string | null) {
     this.peers = peers;
+    this.me = me;
+  }
+
+  /** Peers other than me looking at this card (T9.1). */
+  viewersOf(cardId: string): PresenceFieldsFragment[] {
+    return this.peers.filter(p => p.viewingCardId === cardId && p.sessionId !== this.me);
   }
 
   addLog(entry: LogEntry): LogEntry {

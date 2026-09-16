@@ -21,3 +21,15 @@ export function leave(boardId: string, sessionId: string): Presence[] | null {
 export function list(boardId: string): Presence[] {
   return [...(boards.get(boardId)?.values() ?? [])];
 }
+
+/** Card-level presence (T9.1): null clears. Returns the peers, or null when the session is not on the board. */
+export function setViewing(
+  boardId: string,
+  sessionId: string,
+  cardId: string | null
+): Presence[] | null {
+  const peer = boards.get(boardId)?.get(sessionId);
+  if (!peer) return null;
+  peer.viewingCardId = cardId;
+  return list(boardId);
+}

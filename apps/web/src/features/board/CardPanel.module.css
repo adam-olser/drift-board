@@ -45,6 +45,18 @@
   border-radius: var(--radius);
   color: var(--muted);
 }
+.pill[data-tone='ok'] {
+  color: var(--ok);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
 .close {
   color: var(--muted);
   display: flex;

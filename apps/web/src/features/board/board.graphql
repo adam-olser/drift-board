@@ -123,3 +123,7 @@ subscription BoardEvents($boardId: ID!) {
     }
   }
 }
+
+mutation SetViewing($boardId: ID!, $cardId: ID) {
+  setViewing(boardId: $boardId, cardId: $cardId)
+}

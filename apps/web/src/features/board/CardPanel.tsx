@@ -46,11 +46,25 @@ export const CardPanel = observer(function CardPanel({
   };
   const history = syncStore.logFor(card.id);
   const offline = syncStore.connection === 'offline';
+  const viewers = syncStore.viewersOf(card.id);
 
   return (
     <aside className={styles.panel} aria-label={`Card ${card.key}`} onKeyDown={onKeyDown}>
       <div className={styles.top}>
-        <span className={styles.key}>{card.key}</span>
+        <div className={styles.topRight}>
+          <span className={styles.key}>{card.key}</span>
+          {viewers.map(v => (
+            <span
+              key={v.sessionId}
+              className={styles.pill}
+              data-tone="ok"
+              aria-label="Also viewing"
+            >
+              <span className={styles.dot} />
+              {initials(v.name)} is editing
+            </span>
+          ))}
+        </div>
         <div className={styles.topRight}>
           <span className={styles.pill}>⌘ ↵ save</span>
           <button type="button" className={styles.close} onClick={onClose} aria-label="Close">

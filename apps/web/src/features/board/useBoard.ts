@@ -6,6 +6,7 @@ import {
   CreateCardDocument,
   DeleteCardDocument,
   MoveCardDocument,
+  SetViewingDocument,
   UpdateCardDocument,
   ViewerDocument,
   type CardFieldsFragment,
@@ -35,6 +36,7 @@ export function useBoard(slug: string) {
   const [updateCard] = useMutation(UpdateCardDocument);
   const [createCard] = useMutation(CreateCardDocument);
   const [deleteCard] = useMutation(DeleteCardDocument);
+  const [setViewingMutation] = useMutation(SetViewingDocument);
 
   const move = (cardId: string, plan: MovePlan) => {
     const card = board?.cards.find(c => c.id === cardId);
@@ -110,5 +112,9 @@ export function useBoard(slug: string) {
     );
   };
 
-  return { board, loading, error, move, rename, edit, create, remove, tailPosition };
+  /** Card-level presence: no opId, never queued, fire and forget. */
+  const setViewing = (cardId: string | null) =>
+    board ? settled(setViewingMutation({ variables: { boardId: board.id, cardId } })) : undefined;
+
+  return { board, loading, error, move, rename, edit, create, remove, tailPosition, setViewing };
 }

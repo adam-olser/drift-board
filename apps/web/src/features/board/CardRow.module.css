@@ -85,3 +85,14 @@
   color: var(--queued);
   flex-shrink: 0;
 }
+
+.viewed {
+  border-color: var(--ok);
+}
+
+.editing {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ok);
+  flex-shrink: 0;
+}
