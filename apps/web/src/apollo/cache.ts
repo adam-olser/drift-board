@@ -13,5 +13,9 @@ export const createCache = () =>
           board: { keyArgs: ['slug'] },
         },
       },
+      Subscription: {
+        // each event replaces the last; the Card objects inside are normalised by id anyway
+        fields: { boardEvents: { merge: false } },
+      },
     },
   });
