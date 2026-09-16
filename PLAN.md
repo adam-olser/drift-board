@@ -1,4 +1,4 @@
-# Driftboard (repo: `sprint-board`) — Real-Time Collaborative Task Board — Project Plan
+# Driftboard (repo: `drift-board`) — Real-Time Collaborative Task Board — Project Plan
 
 ## Context
 
@@ -19,7 +19,7 @@ Adam's `cv.md` currently has **zero evidence** of: real-time multi-user sync, of
 
 ## The Honest Use Case (why this isn't just a tech demo)
 
-**Driftboard** (the product name used throughout `design/`; the repo stays `sprint-board`) — a lightweight, shared kanban board for small teams or freelancer↔client coordination who don't want to pay for Trello/Linear/Asana for a single project. This is a genuine, nameable use case, not an invented pretext — matters because `career-ops`'s source-of-truth rules mean Adam can only ever claim what he actually built and why, never fabricate a "problem" a project didn't really solve.
+**Driftboard** (the product name used throughout `design/`; the repo is `adam-olser/drift-board`) — a lightweight, shared kanban board for small teams or freelancer↔client coordination who don't want to pay for Trello/Linear/Asana for a single project. This is a genuine, nameable use case, not an invented pretext — matters because `career-ops`'s source-of-truth rules mean Adam can only ever claim what he actually built and why, never fabricate a "problem" a project didn't really solve.
 
 ## Source of Truth
 
@@ -32,7 +32,7 @@ When they disagree, fix the losing side in the same session and log it in `DECIS
 
 ## Repository Setup
 
-- New standalone GitHub repo: `sprint-board` (or `adam-olser/sprint-board`) — isolated from any production code, freely breakable
+- Standalone GitHub repo: `adam-olser/drift-board` — isolated from any production code, freely breakable
 - Stack, as fixed in `design/Architecture.dc.html`:
   - **Frontend:** React + TypeScript + Vite.
     - **Apollo Client** owns domain data: `InMemoryCache` normalises boards / columns / cards / peers; `optimisticResponse` provides the optimistic layer; a custom **link chain `lag? → log → queue → split(session ops → http, everything else → ws)`**. Board queries, card mutations and subscriptions all ride the one graphql-ws socket, so "socket connected?" is the single offline signal. Only the four session mutations use HTTP, because they set cookies. `lagLink` exists only when `?lag=<ms>` is in the URL and delays every operation — the dev-only switch that makes optimistic UI and rollback visible in a demo.

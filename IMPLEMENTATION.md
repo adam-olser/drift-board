@@ -24,7 +24,7 @@ Companion to `PLAN.md` (why, order, rules) and `design/` (what it looks like). T
 ## 1. Repo shape
 
 ```
-sprint-board/
+drift-board/
 ├── PLAN.md  IMPLEMENTATION.md  DECISIONS.md  README.md
 ├── design/                       # canvas working files + driftboard.html
 ├── docker-compose.yml            # postgres:16, port 5432, volume, init script creating driftboard + driftboard_test
