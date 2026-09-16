@@ -69,6 +69,7 @@ const resolvers = {
     ...presenceResolvers.Mutation,
   },
   Subscription: presenceResolvers.Subscription,
+  Session: sessionResolvers.Session,
   BoardEvent: { __resolveType: e => e.__typename ?? null },
   Viewer: boardResolvers.Viewer,
   Board: boardResolvers.Board,
