@@ -49,9 +49,11 @@
   touch-action: none;
 }
 
-.dragging {
-  position: relative;
-  z-index: 10; /* paint above the neighbouring column's rows while translated across */
+.source {
+  opacity: 0.35;
+}
+
+.overlay {
   cursor: grabbing;
   border-color: var(--border-strong);
   box-shadow: 0 8px 24px var(--shadow);
