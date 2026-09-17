@@ -10,6 +10,8 @@ export const columnDropId = (columnId: string) => `column:${columnId}`;
 interface Props {
   column: ColumnFieldsFragment;
   cards: readonly CardFieldsFragment[];
+  /** Card ids the active filter matches, or undefined when no filter is active. */
+  visibleIds?: ReadonlySet<string> | undefined;
   done?: boolean;
   onCreate: (title: string) => void;
   onRename: (card: CardFieldsFragment, title: string) => void;
@@ -20,12 +22,14 @@ interface Props {
 export function Column({
   column,
   cards,
+  visibleIds,
   done = false,
   onCreate,
   onRename,
   onDelete,
   onOpen,
 }: Props) {
+  const shown = visibleIds ? cards.filter(c => visibleIds.has(c.id)) : cards;
   const { setNodeRef } = useDroppable({ id: columnDropId(column.id) });
   const [adding, setAdding] = useState(false);
   const [title, setTitle] = useState('');
@@ -42,10 +46,12 @@ export function Column({
     <section ref={setNodeRef} className={styles.column} aria-label={column.title}>
       <header className={styles.header}>
         <span>{column.title}</span>
-        <span className={styles.count}>{cards.length}</span>
+        <span className={styles.count}>
+          {visibleIds ? `${shown.length} / ${cards.length}` : cards.length}
+        </span>
       </header>
-      <SortableContext items={cards.map(c => c.id)} strategy={verticalListSortingStrategy}>
-        {cards.map(card => (
+      <SortableContext items={shown.map(c => c.id)} strategy={verticalListSortingStrategy}>
+        {shown.map(card => (
           <CardRow
             key={card.id}
             card={card}

@@ -31,6 +31,12 @@ interface Props {
   onRename: (card: CardFieldsFragment, title: string) => void;
   onDelete: (card: CardFieldsFragment) => void;
   onOpen: (card: CardFieldsFragment) => void;
+  /**
+   * Card ids the active filter matches, or undefined when no filter is active. Only hides
+   * rows and drop targets — planMove still sees every card in `board.cards` so a filtered
+   * card's position is still computed against its real neighbours, filtered or not.
+   */
+  visibleIds?: ReadonlySet<string> | undefined;
 }
 
 /** Group the flat card list by column, sorted by position. */
@@ -64,7 +70,7 @@ function toDropTarget(overId: string): DropTarget {
 
 const LONG_PRESS_MS = 500;
 
-export function Board({ board, onMove, onCreate, onRename, onDelete, onOpen }: Props) {
+export function Board({ board, onMove, onCreate, onRename, onDelete, onOpen, visibleIds }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const phone = usePhone();
   const [tab, setTab] = useState<string | null>(null);
@@ -132,7 +138,13 @@ export function Board({ board, onMove, onCreate, onRename, onDelete, onOpen }: P
               onClick={() => setTab(column.id)}
             >
               <span>{column.title}</span>
-              <span className={styles.tabCount}>{(grouped.get(column.id) ?? []).length}</span>
+              <span className={styles.tabCount}>
+                {(() => {
+                  const all = grouped.get(column.id) ?? [];
+                  const shown = visibleIds ? all.filter(c => visibleIds.has(c.id)) : all;
+                  return visibleIds ? `${shown.length}/${all.length}` : all.length;
+                })()}
+              </span>
             </button>
           ))}
         </nav>
@@ -150,6 +162,7 @@ export function Board({ board, onMove, onCreate, onRename, onDelete, onOpen }: P
             key={column.id}
             column={column}
             cards={grouped.get(column.id) ?? []}
+            visibleIds={visibleIds}
             done={column === last}
             onCreate={title => onCreate(column.id, title)}
             onRename={onRename}
