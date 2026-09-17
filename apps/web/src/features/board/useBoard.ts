@@ -88,12 +88,24 @@ export function useBoard(slug: string) {
           opId: opId(),
           cardId: card.id,
           baseVersion: card.version,
-          title: fields.title ?? null,
-          description: fields.description ?? null,
-          priority: fields.priority ?? null,
-          dueDate: fields.dueDate === undefined ? null : fields.dueDate,
-          assigneeSessionId:
-            fields.assigneeSessionId === undefined ? null : fields.assigneeSessionId,
+          // why: every key here must be genuinely absent (not present-as-undefined, not null)
+          // when the caller didn't touch that field. UpdateCard binds each argument to a
+          // variable in one fixed document, so Apollo always sends *some* value for a key that
+          // is present; JSON.stringify is the only way to actually omit it from the wire, and
+          // it drops undefined-valued keys but keeps explicit null, so the key has to be left
+          // out of this object entirely, not set to undefined (exactOptionalPropertyTypes
+          // enforces that same distinction on the object literal). The server tells "leave
+          // unchanged" (argument absent) from "clear" (explicit null) apart on that same wire
+          // distinction, so sending null for an untouched field used to silently clear it —
+          // title/description happened to survive because their SQL uses coalesce(null, ...),
+          // but priority/dueDate/assigneeSessionId do not.
+          ...(fields.title !== undefined ? { title: fields.title } : {}),
+          ...(fields.description !== undefined ? { description: fields.description } : {}),
+          ...(fields.priority !== undefined ? { priority: fields.priority } : {}),
+          ...(fields.dueDate !== undefined ? { dueDate: fields.dueDate } : {}),
+          ...(fields.assigneeSessionId !== undefined
+            ? { assigneeSessionId: fields.assigneeSessionId }
+            : {}),
         },
         optimisticResponse: { updateCard: optimisticCard },
       })
