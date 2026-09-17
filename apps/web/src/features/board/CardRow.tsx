@@ -169,7 +169,14 @@ export function CardRow({ card, done = false, onRename, onDelete, onOpen }: Prop
       {...listeners}
       onKeyDown={e => {
         if (e.key === 'Delete' || e.key === 'Backspace') onDelete();
-        else listeners?.['onKeyDown']?.(e);
+        else if (e.key === 'Enter' && !isDragging) {
+          // why: dnd-kit's KeyboardSensor treats both Space and Enter as "start/end drag" on
+          // this row (it has role="button" tabIndex=0 from `attributes`). Enter opening the
+          // card instead is the only way a keyboard-only user can reach the one thing the
+          // detail panel exists for; Space is left alone so keyboard drag still works.
+          e.preventDefault();
+          onOpen();
+        } else listeners?.['onKeyDown']?.(e);
       }}
       onClick={e => {
         const target = e.target as HTMLElement;
