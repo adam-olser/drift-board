@@ -4,6 +4,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { createApolloClient } from './apollo/client';
 import { Board } from './features/board/Board';
 import { CardPanel } from './features/board/CardPanel';
+import {
+  EMPTY_FILTER,
+  isFilterActive,
+  matchesFilter,
+  type BoardFilter,
+} from './features/board/filter';
+import { FilterBar } from './features/board/FilterBar';
 import { useBoard } from './features/board/useBoard';
 import { useBoardEvents } from './features/board/useBoardEvents';
 import { Home } from './features/boards/Home';
@@ -46,6 +53,7 @@ const BoardScreen = observer(function BoardScreen({
     setViewing,
   } = useBoard(slug);
   useBoardEvents(board?.id);
+  const [filter, setFilter] = useState<BoardFilter>(EMPTY_FILTER);
   const [openId, setOpenIdState] = useState<string | null>(null);
   const setOpenId = (id: string | null) => {
     setOpenIdState(id);
@@ -70,6 +78,9 @@ const BoardScreen = observer(function BoardScreen({
     });
   }
   const peers = [...peerMap.values()];
+  const active = isFilterActive(filter);
+  const matched = board.cards.filter(c => matchesFilter(c, filter));
+  const visibleIds = active ? new Set(matched.map(c => c.id)) : undefined;
   const panelFor = (card: NonNullable<typeof open>, full: boolean) => (
     <CardPanel
       card={card}
@@ -122,6 +133,14 @@ const BoardScreen = observer(function BoardScreen({
       ) : (
         <div className={styles.body}>
           <div className={styles.main}>
+            <FilterBar
+              filter={filter}
+              onChange={setFilter}
+              peers={peers}
+              boardLabels={board.labels}
+              matchCount={matched.length}
+              totalCount={board.cards.length}
+            />
             <Board
               board={board}
               onMove={move}
@@ -129,6 +148,7 @@ const BoardScreen = observer(function BoardScreen({
               onRename={rename}
               onDelete={card => remove(card.id)}
               onOpen={card => setOpenId(card.id)}
+              visibleIds={visibleIds}
             />
             <SyncLog />
           </div>
