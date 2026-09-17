@@ -1,0 +1,14 @@
+{
+  "name": "Driftboard",
+  "short_name": "Driftboard",
+  "description": "A small collaborative task board with real-time sync and offline support.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121317",
+  "theme_color": "#121317",
+  "icons": [
+    { "src": "/favicon-32.png", "sizes": "32x32", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
