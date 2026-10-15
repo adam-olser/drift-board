@@ -41,9 +41,55 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
     />
+    <style>
+      /* Shown until React mounts; the bundle is ~600 kB, so this is not a blank page on slow links. */
+      .splash {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font:
+          600 14px/1 'IBM Plex Sans',
+          'Helvetica Neue',
+          Arial,
+          sans-serif;
+        color: #9aa0ab;
+        animation: splash-in 400ms 300ms backwards;
+      }
+      @keyframes splash-in {
+        from {
+          opacity: 0;
+        }
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #121317;
+        }
+      }
+      @media (prefers-color-scheme: light) {
+        body {
+          background: #f3f4f2;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="splash">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="#b7f26a"
+          stroke-width="1.5"
+        >
+          <path d="M2 5h12M2 8h8M2 11h10" />
+        </svg>
+        Loading Driftboard…
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -2,6 +2,7 @@ import { ApolloProvider } from '@apollo/client';
 import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo, useState } from 'react';
 import { createApolloClient } from './apollo/client';
+import { Loading } from './Loading';
 import { Board } from './features/board/Board';
 import { CardPanel } from './features/board/CardPanel';
 import {
@@ -61,8 +62,17 @@ const BoardScreen = observer(function BoardScreen({
   };
   const open = openId ? (board?.cards.find(c => c.id === openId) ?? null) : null;
   const page = cardKey ? (board?.cards.find(c => c.key === cardKey) ?? null) : null;
-  if (loading) return <p className={styles.status}>Loading…</p>;
-  if (error) return <p className={styles.status}>Could not load the board: {error.message}</p>;
+  if (loading) return <Loading />;
+  if (error) {
+    return (
+      <p className={styles.status}>
+        Could not load the board: {error.message}{' '}
+        <button type="button" onClick={() => location.reload()}>
+          Retry
+        </button>
+      </p>
+    );
+  }
   if (!board) return <p className={styles.status}>No board at /b/{slug}.</p>;
   const columns = [...board.columns].sort((a, b) => a.position - b.position);
   // Everyone assignable: connected peers (live) plus anyone who has ever edited a card here
@@ -164,7 +174,7 @@ function Screen() {
   const viewer = useViewer();
   const { board } = useBoard(route.kind === 'board' ? route.slug : '');
   const [signIn, setSignIn] = useState(false);
-  if (viewer.loading) return null;
+  if (viewer.loading) return <Loading />;
   return (
     <>
       {route.kind === 'board' ? (
