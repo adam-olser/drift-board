@@ -1,10 +1,11 @@
-# Render blueprint: one always-on web service serving the API and the web bundle.
+# Render blueprint: one web service serving the API and the web bundle. Free plan (D-028): it
+# sleeps after ~15 min idle and the first request wakes it, which takes up to a minute.
 # The database is Neon (D-008); paste its connection string as DATABASE_URL in the dashboard.
 services:
   - type: web
     name: driftboard
     runtime: node
-    plan: starter
+    plan: free
     region: frankfurt
     branch: main
     autoDeploy: true

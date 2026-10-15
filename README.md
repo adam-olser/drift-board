@@ -2,7 +2,7 @@
 
 A small collaborative task board for a freelancer and a client, or a two-to-five person team, to coordinate work on one link with no accounts: open the board, pick a name, drag cards. It exists to demonstrate the mechanics behind a real-time, offline-tolerant sync layer, the kind of thing Linear's job description calls "a proprietary websocket data sync framework built for speed and offline support", so it is deliberately not a Linear clone and not a product: one board schema, three columns, cards with a title and a description. What it does have is built end to end and running live: GraphQL over one graphql-ws socket for queries, mutations and a per-board `boardEvents` subscription; optimistic UI through Apollo's cache with a client-generated id per card; version-checked text edits where the earlier writer wins and the loser gets a toast; an in-memory offline queue in a MobX store that replays in order on reconnect, rebasing each later edit onto the version the earlier one produced, then refetches the board; an idempotent ops ledger so a retried mutation returns its stored result; connection- and card-level presence; and a sync log you can open with ⌘. to watch all of it happen.
 
-**Live:** https://driftboard-4yjg.onrender.com — open the same board link in two windows, pick two names.
+**Live:** https://driftboard-4yjg.onrender.com — open the same board link in two windows, pick two names. It runs on Render's free plan, so after about 15 minutes idle the first load takes up to a minute while the server wakes.
 
 ## Stack, as built
 
@@ -26,6 +26,7 @@ Account auth (sign-up, sign-in, sign-out with `crypto.scrypt`; signing in upgrad
 ## Not built
 
 - **Orgs, roles, permissions, invitations, password reset, email verification.** Anyone with the link can edit; auth only adds "My boards".
+- **Always-on hosting.** The free plan sleeps when idle (D-028); a paid instance removes the cold start.
 - **Multi-instance deployment.** Pubsub and presence live in process memory, which is the honest reason Linear runs Redis and this does not.
 - **Live co-editing of text.** Edits are version-checked, earlier writer wins; no CRDT, because a title is not a document.
 - **Persisting the offline queue** across reloads. It is in memory; `idb-keyval` was the named stretch.
